@@ -407,7 +407,12 @@ window.onload = function() {
 
 <!-- Modal de Configuração Interna -->
 <div id="configScreen" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-  <div class="bg-white p-6 rounded-lg shadow-xl max-w-md w-full">
+  <div class="bg-white p-6 rounded-lg shadow-xl max-w-md w-full overflow-y-auto max-h-[90vh] relative">
+<button onclick="fecharConfig()"
+  class="absolute top-3 right-3 text-gray-500 hover:text-red-600 text-xl font-bold">
+  &times;
+</button>
+
     <h2 class="text-xl font-bold text-gray-800 mb-4">Configurações de Prioridades</h2>
     <form class="space-y-4">
       <div>
@@ -427,7 +432,29 @@ window.onload = function() {
         <button type="button" onclick="fecharConfig()" class="border px-4 py-2 rounded">Fechar</button>
       </div>
     </form>
+  
+<hr class="my-6 border-t border-gray-300">
+
+<!-- Gerenciar Usuários (Admin) -->
+<div class="mt-6">
+  <h2 class="text-lg font-bold text-gray-800 mb-2">Gerenciar Usuários</h2>
+  <div class="space-y-2 mb-4">
+    <input id="novoUsuario" type="text" placeholder="Novo Usuário" class="w-full p-2 border rounded" />
+    <input id="senhaUsuario" type="password" placeholder="Senha" class="w-full p-2 border rounded" />
+    <select id="permissaoUsuario" class="w-full p-2 border rounded">
+      <option value="solicitante">Solicitante</option>
+      <option value="admin">Admin</option>
+    </select>
+    <button onclick="cadastrarUsuario()" class="bg-green-600 text-white px-4 py-2 rounded">Cadastrar</button>
   </div>
+  <table class="w-full mt-2 border">
+    <thead class="bg-gray-100">
+      <tr><th class="p-2">Usuário</th><th class="p-2">Permissão</th><th class="p-2">Ações</th></tr>
+    </thead>
+    <tbody id="tabelaUsuarios" class="text-sm"></tbody>
+  </table>
+</div>
+</div>
 </div>
 
 
@@ -452,6 +479,72 @@ function salvarConfiguracoes() {
   aplicarTempos();
   fecharConfig();
 }
+
+// Gerenciamento de Usuários
+const usuariosKey = "usuarios";
+let usuarios = JSON.parse(localStorage.getItem(usuariosKey)) || {
+  "admin": { senha: "2025", permissao: "admin" },
+  "Ricardo": { senha: "1234", permissao: "solicitante" }
+};
+
+function salvarUsuarios() {
+  localStorage.setItem(usuariosKey, JSON.stringify(usuarios));
+  listarUsuarios();
+}
+
+function listarUsuarios() {
+  const tbody = document.getElementById("tabelaUsuarios");
+  if (!tbody) return;
+  tbody.innerHTML = "";
+  Object.entries(usuarios).forEach(([user, info]) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td class="p-2">${user}</td>
+      <td class="p-2">${info.permissao}</td>
+      <td class="p-2 space-x-2">
+        <button onclick="editarUsuario('${user}')" class="text-blue-600">Editar</button>
+        <button onclick="excluirUsuario('${user}')" class="text-red-600">Excluir</button>
+      </td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+function cadastrarUsuario() {
+  const user = document.getElementById("novoUsuario").value.trim();
+  const senha = document.getElementById("senhaUsuario").value.trim();
+  const permissao = document.getElementById("permissaoUsuario").value;
+  if (!user || !senha) return alert("Preencha todos os campos.");
+  usuarios[user] = { senha, permissao };
+  salvarUsuarios();
+}
+
+function editarUsuario(user) {
+  const novaSenha = prompt("Nova senha para " + user + ":");
+  const novaPerm = prompt("Nova permissão (admin/solicitante):", usuarios[user].permissao);
+  if (novaSenha && novaPerm) {
+    usuarios[user].senha = novaSenha;
+    usuarios[user].permissao = novaPerm;
+    salvarUsuarios();
+  }
+}
+
+function excluirUsuario(user) {
+  if (confirm("Deseja excluir o usuário " + user + "?")) {
+    delete usuarios[user];
+    salvarUsuarios();
+  }
+}
+
+window.onload = function() {
+  document.body.classList.add("body-login");
+  populateMaterialDropdown();
+  document.getElementById("solicitante").value = currentUser;
+  const saved = localStorage.getItem("solicitacoes");
+  if (saved) document.getElementById("requestsTableBody").innerHTML = saved;
+  aplicarTempos();
+  listarUsuarios();
+};
+
 </script>
 
 </body>
