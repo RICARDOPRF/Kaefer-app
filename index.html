@@ -69,6 +69,22 @@ function abrirConfiguracoes() {
   </style>
  </head>
  <body class="bg-gray-50">
+  <!-- Tela de Login -->
+  <div class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-cover bg-center" id="loginScreen" style="background-image: url('https://i.postimg.cc/tC067ZNG/TKLOGIN-Obra.png');">
+   <div class="bg-white/90 backdrop-blur p-6 rounded-lg shadow-md w-full max-w-sm">
+    <h2 class="text-xl font-bold mb-4 text-center text-gray-800">
+     Acesso ao Sistema
+    </h2>
+    <input class="mb-3 w-full p-2 border rounded" id="user" placeholder="Usuário" type="text"/>
+    <input class="mb-4 w-full p-2 border rounded" id="pass" placeholder="Senha" type="password"/>
+    <button class="w-full bg-blue-600 text-white py-2 rounded" onclick="login()">
+     Entrar
+    </button>
+    <p class="text-red-600 text-sm mt-2 hidden text-center" id="loginError">
+     Usuário ou senha inválidos
+    </p>
+   </div>
+  </div>
   <!-- Login Screen com imagem de fundo -->
   <div class="hidden container mx-auto px-4 py-8 max-w-6xl" id="app">
    <!-- Top bar com usuário logado -->
@@ -484,5 +500,32 @@ function salvarConfiguracoes() {
   fecharConfig();
 }
   </script>
+  <script>
+   let currentUser = "";
+function login() {
+  const u = document.getElementById("user").value.trim();
+  const p = document.getElementById("pass").value.trim();
+  const validUsers = {
+    "admin": "2025",
+    "Sabino": "1234",
+    "Ricardo": "1234"
+  };
+  if (validUsers[u] === p) {
+    currentUser = u;
+    document.getElementById("loginScreen").classList.add("hidden");
+    document.body.classList.remove("no-scroll");
+    document.getElementById("solicitante").value = currentUser;
+  } else {
+    document.getElementById("loginError").classList.remove("hidden");
+  }
+}
+window.onload = function () {
+  document.getElementById("loginScreen").classList.remove("hidden");
+  document.body.classList.add("no-scroll");
+};
+  </script>
+  <style>
+   body.no-scroll { overflow: hidden; }
+  </style>
  </body>
 </html>
