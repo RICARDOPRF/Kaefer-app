@@ -1,11 +1,13 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Solicitação de Materiais - KAEFER Teckma Engenharia</title>
-    <script src="https://cdn.tailwindcss.com">
-let currentUser = "";
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>
+   Solicitação de Materiais - KAEFER Teckma Engenharia
+  </title>
+  <script src="https://cdn.tailwindcss.com">
+   let currentUser = "";
 
 function login() {
   const u = document.getElementById("user").value.trim();
@@ -38,11 +40,10 @@ function logout() {
 function abrirConfiguracoes() {
   window.open("configuracoes.html", "_blank");
 }
-
-</script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        :root {
+  </script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+  <style>
+   :root {
             --kaefer-blue: #0072B8;
             --kaefer-blue-dark: #005a91;
             --kaefer-red: #D32F2F;
@@ -65,137 +66,185 @@ function abrirConfiguracoes() {
         }
 
         .slide-in { animation: slideIn 0.3s ease-out; }
-    </style>
-</head>
-<body class="bg-gray-50">
-
-<div class="absolute top-4 left-4">
-  <img src="https://placehold.co/300x100/0072B8/FFFFFF?text=KAEFER+Teckma" alt="Logo" class="h-20 drop-shadow" />
-</div>
-
-    
-
-
-<!-- Login Screen com imagem de fundo -->
-<div id="loginScreen" class="relative min-h-screen bg-cover bg-center flex items-center justify-center" style="background-image: url('https://i.postimg.cc/tC067ZNG/TKLOGIN-Obra.png');">
-  <div class="bg-white/80 shadow-lg rounded-lg p-8 w-full max-w-sm text-center backdrop-blur-sm">
-    <img class="opacity-80 drop-shadow-sm" src="https://placehold.co/300x100/0072B8/FFFFFF?text=KAEFER+Teckma" alt="Logo" class="mx-auto mb-6 h-20">
-    <h1 class="text-xl font-bold text-gray-800 mb-4">Acesso ao Sistema</h1>
-    <input id="user" type="text" placeholder="Usuário" class="border border-gray-300 p-2 mb-3 w-full rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
-    <input id="pass" type="password" placeholder="Senha" class="border border-gray-300 p-2 mb-4 w-full rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
-    <button onclick="login()" class="bg-[#0072B8] hover:bg-[#005a91] text-white px-4 py-2 rounded w-full font-semibold">Entrar</button>
-    <p id="loginError" class="text-red-600 mt-3 hidden text-sm">Usuário ou senha inválidos</p>
+  </style>
+ </head>
+ <body class="bg-gray-50">
+  <!-- Login Screen com imagem de fundo -->
+  <div class="relative min-h-screen bg-cover bg-center flex items-center justify-center" id="loginScreen" style="background-image: url('https://i.postimg.cc/tC067ZNG/TKLOGIN-Obra.png');">
+   <div class="bg-white/80 shadow-lg rounded-lg p-8 w-full max-w-sm text-center backdrop-blur-sm">
+    <img alt="Logo" class="mx-auto mb-6 h-20" src="https://placehold.co/300x100/0072B8/FFFFFF?text=KAEFER+Teckma"/>
+    <h1 class="text-xl font-bold text-gray-800 mb-4">
+     Acesso ao Sistema
+    </h1>
+    <input class="border border-gray-300 p-2 mb-3 w-full rounded focus:outline-none focus:ring-2 focus:ring-blue-500" id="user" placeholder="Usuário" type="text"/>
+    <input class="border border-gray-300 p-2 mb-4 w-full rounded focus:outline-none focus:ring-2 focus:ring-blue-500" id="pass" placeholder="Senha" type="password"/>
+    <button class="bg-[#0072B8] hover:bg-[#005a91] text-white px-4 py-2 rounded w-full font-semibold" onclick="login()">
+     Entrar
+    </button>
+    <p class="text-red-600 mt-3 hidden text-sm" id="loginError">
+     Usuário ou senha inválidos
+    </p>
+   </div>
   </div>
-</div>
-
-<div id="app" class="hidden container mx-auto px-4 py-8 max-w-6xl">
-        
-<!-- Top bar com usuário logado -->
-<div class="w-full flex flex-col items-end gap-2 mb-4 pr-1">
-  <div class="flex items-center gap-4">
-  <div class="text-sm text-gray-700">
-    <i class="fa-solid fa-user text-gray-500"></i> <span class="text-sm">Usuário:</span> <span id="usuarioLogado" class="font-semibold text-blue-600"></span>
-  </div>
-  <button onclick="logout()" class="bg-red-600 text-white px-3 py-1 rounded text-sm">Sair</button>
-  </div>
-  <button onclick="abrirConfiguracoes()" class="bg-gray-300 text-gray-800 px-3 py-1 rounded text-sm hover:bg-gray-400">⚙️ Configurações</button>
-</div>
-</div>
-
-<div class="flex flex-col items-center justify-center text-center mb-8">
-            <div>
-                <h1 class="text-3xl font-bold text-gray-800">SOLICITAÇÃO DE MATERIAIS</h1>
-                <p class="text-gray-600">Sistema de gestão de requisições</p>
-            </div>
-        </div>
-
-    <h1 class="text-2xl font-bold mb-4">Solicitação de Materiais</h1>
-
-    <form id="solicitacaoForm" class="bg-white p-4 rounded shadow space-y-4 text-sm">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label for="solicitante" class="block text-sm font-medium text-gray-700 mb-1">Solicitante *</label>
-<input id="solicitante" readonly class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 text-gray-800 shadow-sm" />
-</div>
-        <div>
-          <label for="prioridade" class="block font-semibold mb-1">Prioridade</label>
-          <select id="prioridade" required class="w-full border p-2 rounded">
-  <option value="Baixa">Baixa (Entrega em 4 horas)</option>
-  <option value="Média">Média (Entrega em 2 horas)</option>
-  <option value="Alta">Alta (Entrega imediata)</option>
-</select>
-        </div>
-      </div>
-
-      <div>
-        <label for="materialSearch" class="block font-semibold mb-1">Buscar Material</label>
-        <input type="text" id="materialSearch" placeholder="Digite código ou descrição..."
-          class="w-full border p-2 rounded mb-2" />
-      </div>
-
-      <div>
-        <label for="material" class="block font-semibold mb-1">Material *</label>
-        <select id="material" required size="8"
-          class="w-full border p-2 rounded bg-white"></select>
-      </div>
-
-      
-<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-  <div>
-    <label class="block font-semibold mb-1">Estoque disponível</label>
-    <div id="estoqueInfo" class="bg-gray-100 p-2 rounded text-center w-full min-h-[42px]">--</div>
-  </div>
-  <div>
-    <label class="block font-semibold mb-1">Quantidade</label>
-    <div class="flex w-full min-h-[42px]">
-      <button type="button" id="decreaseQty" class="px-3 bg-gray-200 rounded-l">-</button>
-      <input type="number" id="quantidade" min="1" value="1" class="text-center w-full border-y border-gray-300" />
-      <button type="button" id="increaseQty" class="px-3 bg-gray-200 rounded-r">+</button>
+  <div class="hidden container mx-auto px-4 py-8 max-w-6xl" id="app">
+   <!-- Top bar com usuário logado -->
+   <div class="w-full flex flex-col items-end gap-2 mb-4 pr-1">
+    <div class="flex items-center gap-4">
+     <div class="text-sm text-gray-700">
+      <i class="fa-solid fa-user text-gray-500">
+      </i>
+      <span class="text-sm">
+       Usuário:
+      </span>
+      <span class="font-semibold text-blue-600" id="usuarioLogado">
+      </span>
+     </div>
+     <button class="bg-red-600 text-white px-3 py-1 rounded text-sm" onclick="logout()">
+      Sair
+     </button>
     </div>
+    <button class="bg-gray-300 text-gray-800 px-3 py-1 rounded text-sm hover:bg-gray-400" onclick="abrirConfiguracoes()">
+     ⚙️ Configurações
+    </button>
+   </div>
   </div>
-  <div>
-    <label class="block font-semibold mb-1">Localização</label>
-    <div id="localizacao" class="bg-gray-100 p-2 rounded text-center w-full min-h-[42px]">--</div>
+  <div class="flex flex-col items-center justify-center text-center mb-8">
+   <div>
+    <h1 class="text-3xl font-bold text-gray-800">
+     SOLICITAÇÃO DE MATERIAIS
+    </h1>
+    <p class="text-gray-600">
+     Sistema de gestão de requisições
+    </p>
+   </div>
   </div>
-</div>
-
-
-      <div class="flex justify-end gap-2 pt-2">
-        <button type="reset" class="border px-4 py-2 rounded">Limpar</button>
-        <button type="submit" id="btnSolicitar" class="bg-blue-600 text-white px-4 py-2 rounded disabled:opacity-50" disabled>Enviar</button>
-      </div>
-    </form>
-
-    <div id="feedback" class="hidden p-3 rounded bg-gray-100 text-gray-800"></div>
-
-    
-<div class="bg-white p-6 rounded-xl shadow border border-gray-200">
-  <h2 class="text-2xl font-bold text-[#0072B8] flex items-center gap-2 mb-4">
-    <i class="fa-solid fa-box-open"></i> Solicitações de Materiais
-  </h2>
-  <div class="overflow-x-auto">
+  <h1 class="text-2xl font-bold mb-4">
+   Solicitação de Materiais
+  </h1>
+  <form class="bg-white p-4 rounded shadow space-y-4 text-sm" id="solicitacaoForm">
+   <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div>
+     <label class="block text-sm font-medium text-gray-700 mb-1" for="solicitante">
+      Solicitante *
+     </label>
+     <input class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 text-gray-800 shadow-sm" id="solicitante" readonly=""/>
+    </div>
+    <div>
+     <label class="block font-semibold mb-1" for="prioridade">
+      Prioridade
+     </label>
+     <select class="w-full border p-2 rounded" id="prioridade" required="">
+      <option value="Baixa">
+       Baixa (Entrega em 4 horas)
+      </option>
+      <option value="Média">
+       Média (Entrega em 2 horas)
+      </option>
+      <option value="Alta">
+       Alta (Entrega imediata)
+      </option>
+     </select>
+    </div>
+   </div>
+   <div>
+    <label class="block font-semibold mb-1" for="materialSearch">
+     Buscar Material
+    </label>
+    <input class="w-full border p-2 rounded mb-2" id="materialSearch" placeholder="Digite código ou descrição..." type="text"/>
+   </div>
+   <div>
+    <label class="block font-semibold mb-1" for="material">
+     Material *
+    </label>
+    <select class="w-full border p-2 rounded bg-white" id="material" required="" size="8">
+    </select>
+   </div>
+   <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div>
+     <label class="block font-semibold mb-1">
+      Estoque disponível
+     </label>
+     <div class="bg-gray-100 p-2 rounded text-center w-full min-h-[42px]" id="estoqueInfo">
+      --
+     </div>
+    </div>
+    <div>
+     <label class="block font-semibold mb-1">
+      Quantidade
+     </label>
+     <div class="flex w-full min-h-[42px]">
+      <button class="px-3 bg-gray-200 rounded-l" id="decreaseQty" type="button">
+       -
+      </button>
+      <input class="text-center w-full border-y border-gray-300" id="quantidade" min="1" type="number" value="1"/>
+      <button class="px-3 bg-gray-200 rounded-r" id="increaseQty" type="button">
+       +
+      </button>
+     </div>
+    </div>
+    <div>
+     <label class="block font-semibold mb-1">
+      Localização
+     </label>
+     <div class="bg-gray-100 p-2 rounded text-center w-full min-h-[42px]" id="localizacao">
+      --
+     </div>
+    </div>
+   </div>
+   <div class="flex justify-end gap-2 pt-2">
+    <button class="border px-4 py-2 rounded" type="reset">
+     Limpar
+    </button>
+    <button class="bg-blue-600 text-white px-4 py-2 rounded disabled:opacity-50" disabled="" id="btnSolicitar" type="submit">
+     Enviar
+    </button>
+   </div>
+  </form>
+  <div class="hidden p-3 rounded bg-gray-100 text-gray-800" id="feedback">
+  </div>
+  <div class="bg-white p-6 rounded-xl shadow border border-gray-200">
+   <h2 class="text-2xl font-bold text-[#0072B8] flex items-center gap-2 mb-4">
+    <i class="fa-solid fa-box-open">
+    </i>
+    Solicitações de Materiais
+   </h2>
+   <div class="overflow-x-auto">
     <table class="w-full text-sm text-left border border-gray-200 rounded overflow-hidden">
-      <thead class="bg-[#E3F2FD] text-[#003d66] text-sm font-semibold">
-        <tr>
-          <th class="py-2 px-3 border-b border-gray-300">ID</th>
-          <th class="py-2 px-3 border-b border-gray-300">Material</th>
-          <th class="py-2 px-3 border-b border-gray-300">Qtd</th>
-          <th class="py-2 px-3 border-b border-gray-300">Prioridade</th>
-          <th class="py-2 px-3 border-b border-gray-300">Status</th>
-          <th class="py-2 px-3 border-b border-gray-300">Solicitante</th>
-          <th class="py-2 px-3 border-b border-gray-300">Data</th>
-          <th class="py-2 px-3 border-b border-gray-300">Ações</th>
-        </tr>
-      </thead>
-      <tbody id="requestsTableBody" class="divide-y divide-gray-100 bg-white"></tbody>
-    </table></div>
+     <thead class="bg-[#E3F2FD] text-[#003d66] text-sm font-semibold">
+      <tr>
+       <th class="py-2 px-3 border-b border-gray-300">
+        ID
+       </th>
+       <th class="py-2 px-3 border-b border-gray-300">
+        Material
+       </th>
+       <th class="py-2 px-3 border-b border-gray-300">
+        Qtd
+       </th>
+       <th class="py-2 px-3 border-b border-gray-300">
+        Prioridade
+       </th>
+       <th class="py-2 px-3 border-b border-gray-300">
+        Status
+       </th>
+       <th class="py-2 px-3 border-b border-gray-300">
+        Solicitante
+       </th>
+       <th class="py-2 px-3 border-b border-gray-300">
+        Data
+       </th>
+       <th class="py-2 px-3 border-b border-gray-300">
+        Ações
+       </th>
+      </tr>
+     </thead>
+     <tbody class="divide-y divide-gray-100 bg-white" id="requestsTableBody">
+     </tbody>
+    </table>
+   </div>
   </div>
-</div>
-
-  </div>
-
-<script>
-const materiais = {
+  <script>
+   const materiais = {
 "C90322011-6": {quantidade: 2, descricao: "CURVA 90 GR RL AI ASTM A403 WP304L-W SCH 40S ANSI B16.9", location: "Almoxarifado, Prateleira 1", unit: "Pç", weight: "10.1 kg"},
 "MLV004006-4x1": {quantidade: 1, descricao: "MEIA LUVA AI ASTM A182 F304L 3000# SW", location: "Almoxarifado, Prateleira 1", unit: "Pç", weight: "0.26 kg"},
 "REC122017-3X11/4": {quantidade: 1, descricao: "RED CONC AI A403 CR304L SCH 5S MSS SP43", location: "Almoxarifado, Prateleira 1", unit: "Pç", weight: "0.34 kg"},
@@ -370,11 +419,9 @@ function logout() {
 function abrirConfiguracoes() {
   window.open("configuracoes.html", "_blank");
 }
-
-</script>
-
-<script>
-function aplicarTempos() {
+  </script>
+  <script>
+   function aplicarTempos() {
   const tempoAlta = localStorage.getItem("tempoAlta") || "Entrega imediata";
   const tempoMedia = localStorage.getItem("tempoMedia") || "Entrega em 2 horas";
   const tempoBaixa = localStorage.getItem("tempoBaixa") || "Entrega em 4 horas";
@@ -394,37 +441,45 @@ window.onload = function() {
   if (saved) document.getElementById("requestsTableBody").innerHTML = saved;
   aplicarTempos();
 };
-</script>
-
-
-<!-- Modal de Configuração Interna -->
-<div id="configScreen" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-  <div class="bg-white p-6 rounded-lg shadow-xl max-w-md w-full">
-    <h2 class="text-xl font-bold text-gray-800 mb-4">Configurações de Prioridades</h2>
+  </script>
+  <!-- Modal de Configuração Interna -->
+  <div class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center" id="configScreen">
+   <div class="bg-white p-6 rounded-lg shadow-xl max-w-md w-full">
+    <h2 class="text-xl font-bold text-gray-800 mb-4">
+     Configurações de Prioridades
+    </h2>
     <form class="space-y-4">
-      <div>
-        <label class="block font-medium">Tempo Alta</label>
-        <input id="tempoAlta" type="text" class="w-full border p-2 rounded" />
-      </div>
-      <div>
-        <label class="block font-medium">Tempo Média</label>
-        <input id="tempoMedia" type="text" class="w-full border p-2 rounded" />
-      </div>
-      <div>
-        <label class="block font-medium">Tempo Baixa</label>
-        <input id="tempoBaixa" type="text" class="w-full border p-2 rounded" />
-      </div>
-      <div class="flex justify-end gap-2">
-        <button type="button" onclick="salvarConfiguracoes()" class="bg-blue-600 text-white px-4 py-2 rounded">Salvar</button>
-        <button type="button" onclick="fecharConfig()" class="border px-4 py-2 rounded">Fechar</button>
-      </div>
+     <div>
+      <label class="block font-medium">
+       Tempo Alta
+      </label>
+      <input class="w-full border p-2 rounded" id="tempoAlta" type="text"/>
+     </div>
+     <div>
+      <label class="block font-medium">
+       Tempo Média
+      </label>
+      <input class="w-full border p-2 rounded" id="tempoMedia" type="text"/>
+     </div>
+     <div>
+      <label class="block font-medium">
+       Tempo Baixa
+      </label>
+      <input class="w-full border p-2 rounded" id="tempoBaixa" type="text"/>
+     </div>
+     <div class="flex justify-end gap-2">
+      <button class="bg-blue-600 text-white px-4 py-2 rounded" onclick="salvarConfiguracoes()" type="button">
+       Salvar
+      </button>
+      <button class="border px-4 py-2 rounded" onclick="fecharConfig()" type="button">
+       Fechar
+      </button>
+     </div>
     </form>
+   </div>
   </div>
-</div>
-
-
-<script>
-function abrirConfiguracoes() {
+  <script>
+   function abrirConfiguracoes() {
   if (currentUser !== "admin") {
     alert("Apenas o usuário admin pode editar as configurações.");
     return;
@@ -444,7 +499,6 @@ function salvarConfiguracoes() {
   aplicarTempos();
   fecharConfig();
 }
-</script>
-
-</body>
+  </script>
+ </body>
 </html>
