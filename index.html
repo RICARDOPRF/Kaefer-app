@@ -66,20 +66,6 @@ function abrirConfiguracoes() {
 
         .slide-in { animation: slideIn 0.3s ease-out; }
     </style>
-
-<style>
-  #loginScreen {
-    position: fixed;
-    inset: 0;
-    z-index: 9999;
-    background-size: cover;
-    overflow-y: auto;
-  }
-  body.no-scroll {
-    overflow: hidden;
-  }
-</style>
-
 </head>
 <body class="bg-gray-50">
 
@@ -123,8 +109,7 @@ function abrirConfiguracoes() {
             </div>
         </div>
 
-    <img src="https://i.postimg.cc/yYbD80Jh/logo-kaefer-small.png" alt="Logo KAEFER" class="h-10 mb-4">
-<h1 class="text-2xl font-bold mb-4">Solicitação de Materiais</h1>
+    <h1 class="text-2xl font-bold mb-4">Solicitação de Materiais</h1>
 
     <form id="solicitacaoForm" class="bg-white p-4 rounded shadow space-y-4 text-sm">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -210,16 +195,6 @@ function abrirConfiguracoes() {
   </div>
 
 <script>
-
-function showLogin() {
-  document.getElementById('loginScreen').classList.remove('hidden');
-  document.body.classList.add('no-scroll');
-}
-function hideLogin() {
-  document.getElementById('loginScreen').classList.add('hidden');
-  document.body.classList.remove('no-scroll');
-}
-
 const materiais = {
 "C90322011-6": {quantidade: 2, descricao: "CURVA 90 GR RL AI ASTM A403 WP304L-W SCH 40S ANSI B16.9", location: "Almoxarifado, Prateleira 1", unit: "Pç", weight: "10.1 kg"},
 "MLV004006-4x1": {quantidade: 1, descricao: "MEIA LUVA AI ASTM A182 F304L 3000# SW", location: "Almoxarifado, Prateleira 1", unit: "Pç", weight: "0.26 kg"},
