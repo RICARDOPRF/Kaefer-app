@@ -67,6 +67,9 @@ function abrirConfiguracoes() {
 
         .slide-in { animation: slideIn 0.3s ease-out; }
   </style>
+  <style>
+   body.no-scroll { overflow: hidden; }
+  </style>
  </head>
  <body class="bg-gray-50">
   <!-- Login Screen com imagem de fundo -->
@@ -498,6 +501,28 @@ function salvarConfiguracoes() {
   localStorage.setItem("tempoBaixa", document.getElementById("tempoBaixa").value);
   aplicarTempos();
   fecharConfig();
+}
+  </script>
+  <script>
+   window.onload = function () {
+  document.getElementById("loginScreen").classList.remove("hidden");
+  document.body.classList.add("no-scroll");
+};
+function login() {
+  const u = document.getElementById("user").value.trim();
+  const p = document.getElementById("pass").value.trim();
+  const validUsers = {
+    "admin": "2025",
+    "Sabino": "1234",
+    "Ricardo": "1234"
+  };
+  if (validUsers[u] === p) {
+    document.getElementById("loginScreen").classList.add("hidden");
+    document.body.classList.remove("no-scroll");
+    document.getElementById("solicitante").value = u;
+  } else {
+    document.getElementById("loginError").classList.remove("hidden");
+  }
 }
   </script>
  </body>
