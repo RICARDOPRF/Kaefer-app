@@ -73,6 +73,55 @@ function logout() {
   location.reload();
 }
 
+
+function abrirAdicionarEstoque() {
+  if (usuarios[currentUser]?.permissao === "admin" || usuarios[currentUser]?.permissao === "mista") {
+    document.getElementById("estoqueScreen").classList.remove("hidden");
+  } else {
+    alert("Você não tem permissão para adicionar estoque.");
+  }
+}
+function fecharAdicionarEstoque() {
+  document.getElementById("estoqueScreen").classList.add("hidden");
+}
+function salvarNovoEstoque() {
+  const codigo = document.getElementById("novoCodigo").value.trim();
+  const descricao = document.getElementById("novaDescricao").value.trim();
+  const quantidade = parseInt(document.getElementById("novaQuantidade").value.trim());
+  const unidade = document.getElementById("novaUnidade").value.trim();
+  const localizacao = document.getElementById("novaLocalizacao").value.trim();
+  const peso = document.getElementById("novoPeso").value.trim();
+
+  if (!codigo || !descricao || !quantidade || !unidade || !localizacao || !peso) {
+    alert("Preencha todos os campos.");
+    return;
+  }
+  if (materiais[codigo]) {
+    alert("Já existe um material com esse código.");
+    return;
+  }
+
+  materiais[codigo] = {
+    quantidade: quantidade,
+    descricao: descricao,
+    unit: unidade,
+    location: localizacao,
+    weight: peso
+  };
+
+  localStorage.setItem("materiais", JSON.stringify(materiais));
+  populateMaterialDropdown();
+  fecharAdicionarEstoque();
+  showFeedback("Material adicionado com sucesso!", "bg-green-100", "text-green-700");
+
+  document.getElementById("novoCodigo").value = "";
+  document.getElementById("novaDescricao").value = "";
+  document.getElementById("novaQuantidade").value = "";
+  document.getElementById("novaUnidade").value = "";
+  document.getElementById("novaLocalizacao").value = "";
+  document.getElementById("novoPeso").value = "";
+}
+
 function abrirConfiguracoes() {
   window.open("configuracoes.html", "_blank");
 }
@@ -187,6 +236,12 @@ function abrirConfiguracoes() {
   <div>
     <label class="block font-semibold mb-1">Estoque disponível</label>
     <div id="estoqueInfo" class="bg-gray-100 p-2 rounded text-center w-full min-h-[42px]">--</div>
+<div class="mt-2">
+  <button type="button" onclick="abrirAdicionarEstoque()" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm">
+    <i class="fa-solid fa-plus"></i> Adicionar Estoque
+  </button>
+</div>
+
   </div>
   <div>
     <label class="block font-semibold mb-1">Quantidade</label>
@@ -249,7 +304,7 @@ function abrirConfiguracoes() {
   </div>
 
 <script>
-const materiais = {
+let materiais = JSON.parse(localStorage.getItem("materiais")) || {
 "C90322011-6": {quantidade: 2, descricao: "CURVA 90 GR RL AI ASTM A403 WP304L-W SCH 40S ANSI B16.9", location: "Almoxarifado, Prateleira 1", unit: "Pç", weight: "10.1 kg"},
 "MLV004006-4x1": {quantidade: 1, descricao: "MEIA LUVA AI ASTM A182 F304L 3000# SW", location: "Almoxarifado, Prateleira 1", unit: "Pç", weight: "0.26 kg"},
 "REC122017-3X11/4": {quantidade: 1, descricao: "RED CONC AI A403 CR304L SCH 5S MSS SP43", location: "Almoxarifado, Prateleira 1", unit: "Pç", weight: "0.34 kg"},
@@ -334,7 +389,7 @@ document.getElementById("solicitacaoForm").addEventListener("submit", function (
   const id = Math.floor(Math.random() * 10000);
   tr.innerHTML = `<td>${id}</td><td>${m}</td><td>${q}</td><td>${p}</td>
   <td>Pendente</td><td>${s}</td><td>${new Date().toLocaleString()}</td>
-  <td><button onclick="concluir(this)" class="bg-green-500 hover:bg-green-600 text-white px-2 py-1 rounded"><i class="fa-solid fa-check"></i></button> <button onclick="excluir(this)" class="bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded"><i class="fa-solid fa-times"></i></button></td>`;
+  <td><button onclick="concluir(this)">✔</button> <button onclick="excluir(this)">✖</button></td>`;
   tbody.appendChild(tr);
   localStorage.setItem("solicitacoes", tbody.innerHTML);
   showFeedback("Solicitação enviada com sucesso!", "bg-green-100", "text-green-700");
@@ -460,6 +515,55 @@ function logout() {
   location.reload();
 }
 
+
+function abrirAdicionarEstoque() {
+  if (usuarios[currentUser]?.permissao === "admin" || usuarios[currentUser]?.permissao === "mista") {
+    document.getElementById("estoqueScreen").classList.remove("hidden");
+  } else {
+    alert("Você não tem permissão para adicionar estoque.");
+  }
+}
+function fecharAdicionarEstoque() {
+  document.getElementById("estoqueScreen").classList.add("hidden");
+}
+function salvarNovoEstoque() {
+  const codigo = document.getElementById("novoCodigo").value.trim();
+  const descricao = document.getElementById("novaDescricao").value.trim();
+  const quantidade = parseInt(document.getElementById("novaQuantidade").value.trim());
+  const unidade = document.getElementById("novaUnidade").value.trim();
+  const localizacao = document.getElementById("novaLocalizacao").value.trim();
+  const peso = document.getElementById("novoPeso").value.trim();
+
+  if (!codigo || !descricao || !quantidade || !unidade || !localizacao || !peso) {
+    alert("Preencha todos os campos.");
+    return;
+  }
+  if (materiais[codigo]) {
+    alert("Já existe um material com esse código.");
+    return;
+  }
+
+  materiais[codigo] = {
+    quantidade: quantidade,
+    descricao: descricao,
+    unit: unidade,
+    location: localizacao,
+    weight: peso
+  };
+
+  localStorage.setItem("materiais", JSON.stringify(materiais));
+  populateMaterialDropdown();
+  fecharAdicionarEstoque();
+  showFeedback("Material adicionado com sucesso!", "bg-green-100", "text-green-700");
+
+  document.getElementById("novoCodigo").value = "";
+  document.getElementById("novaDescricao").value = "";
+  document.getElementById("novaQuantidade").value = "";
+  document.getElementById("novaUnidade").value = "";
+  document.getElementById("novaLocalizacao").value = "";
+  document.getElementById("novoPeso").value = "";
+}
+
 function abrirConfiguracoes() {
   window.open("configuracoes.html", "_blank");
 }
@@ -546,6 +650,55 @@ window.onload = function() {
 
 
 <script>
+
+function abrirAdicionarEstoque() {
+  if (usuarios[currentUser]?.permissao === "admin" || usuarios[currentUser]?.permissao === "mista") {
+    document.getElementById("estoqueScreen").classList.remove("hidden");
+  } else {
+    alert("Você não tem permissão para adicionar estoque.");
+  }
+}
+function fecharAdicionarEstoque() {
+  document.getElementById("estoqueScreen").classList.add("hidden");
+}
+function salvarNovoEstoque() {
+  const codigo = document.getElementById("novoCodigo").value.trim();
+  const descricao = document.getElementById("novaDescricao").value.trim();
+  const quantidade = parseInt(document.getElementById("novaQuantidade").value.trim());
+  const unidade = document.getElementById("novaUnidade").value.trim();
+  const localizacao = document.getElementById("novaLocalizacao").value.trim();
+  const peso = document.getElementById("novoPeso").value.trim();
+
+  if (!codigo || !descricao || !quantidade || !unidade || !localizacao || !peso) {
+    alert("Preencha todos os campos.");
+    return;
+  }
+  if (materiais[codigo]) {
+    alert("Já existe um material com esse código.");
+    return;
+  }
+
+  materiais[codigo] = {
+    quantidade: quantidade,
+    descricao: descricao,
+    unit: unidade,
+    location: localizacao,
+    weight: peso
+  };
+
+  localStorage.setItem("materiais", JSON.stringify(materiais));
+  populateMaterialDropdown();
+  fecharAdicionarEstoque();
+  showFeedback("Material adicionado com sucesso!", "bg-green-100", "text-green-700");
+
+  document.getElementById("novoCodigo").value = "";
+  document.getElementById("novaDescricao").value = "";
+  document.getElementById("novaQuantidade").value = "";
+  document.getElementById("novaUnidade").value = "";
+  document.getElementById("novaLocalizacao").value = "";
+  document.getElementById("novoPeso").value = "";
+}
+
 function abrirConfiguracoes() {
   if (usuarios[currentUser]?.permissao !== "admin") {
     alert("Apenas o usuário admin pode editar as configurações.");
@@ -641,6 +794,29 @@ window.onload = function() {
 };
 
 </script>
+
+
+<!-- Modal Adicionar Estoque -->
+<div id="estoqueScreen" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
+  <div class="bg-white p-6 rounded-lg shadow-xl max-w-md w-full overflow-y-auto max-h-[90vh] relative">
+    <button onclick="fecharAdicionarEstoque()" class="absolute top-3 right-3 text-gray-500 hover:text-red-600 text-xl font-bold">
+      &times;
+    </button>
+    <h2 class="text-xl font-bold text-gray-800 mb-4">Adicionar Estoque</h2>
+    <div class="space-y-3">
+      <input id="novoCodigo" type="text" placeholder="Código do material" class="w-full p-2 border rounded" />
+      <input id="novaDescricao" type="text" placeholder="Descrição" class="w-full p-2 border rounded" />
+      <input id="novaQuantidade" type="number" placeholder="Quantidade" class="w-full p-2 border rounded" />
+      <input id="novaUnidade" type="text" placeholder="Unidade (ex: Pç, mm)" class="w-full p-2 border rounded" />
+      <input id="novaLocalizacao" type="text" placeholder="Localização" class="w-full p-2 border rounded" />
+      <input id="novoPeso" type="text" placeholder="Peso (ex: 1.5 kg)" class="w-full p-2 border rounded" />
+    </div>
+    <div class="flex justify-end gap-2 mt-4">
+      <button onclick="fecharAdicionarEstoque()" class="border px-4 py-2 rounded">Cancelar</button>
+      <button onclick="salvarNovoEstoque()" class="bg-green-600 text-white px-4 py-2 rounded">Salvar</button>
+    </div>
+  </div>
+</div>
 
 </body>
 </html>
