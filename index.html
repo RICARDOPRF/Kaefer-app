@@ -26,6 +26,26 @@ function login() {
     document.getElementById("loginScreen").style.display = "none";
     document.getElementById("app").classList.remove("hidden");
     document.getElementById("usuarioLogado").textContent = currentUser;
+  // Mostrar filtro apenas para admin ou mista
+  if (usuarios[currentUser]?.permissao === "admin" || usuarios[currentUser]?.permissao === "mista") {
+    document.getElementById("statusFilterContainer").classList.remove("hidden");
+  }
+
+  // Filtrar solicitações
+  const statusFilter = document.getElementById("statusFilter");
+  statusFilter.addEventListener("change", function() {
+    const selected = this.value;
+    const rows = document.querySelectorAll("#requestsTableBody tr");
+    rows.forEach(row => {
+      const statusText = row.cells[4].innerText.trim();
+      if (selected === "Todos" || statusText.includes(selected)) {
+        row.style.display = "";
+      } else {
+        row.style.display = "none";
+      }
+    });
+  });
+
   // Exibir badge de permissão no topo
   if (usuarios[currentUser]) {
     const perm = usuarios[currentUser].permissao;
@@ -196,6 +216,17 @@ function abrirConfiguracoes() {
   <h2 class="text-2xl font-bold text-[#0072B8] flex items-center gap-2 mb-4">
     <i class="fa-solid fa-box-open"></i> Solicitações de Materiais
   </h2>
+  
+<div id="statusFilterContainer" class="mb-4 hidden">
+  <label for="statusFilter" class="font-semibold mr-2">Filtrar por status:</label>
+  <select id="statusFilter" class="border p-1 rounded">
+    <option value="Todos">Todos</option>
+    <option value="Pendente">Pendentes</option>
+    <option value="Entregue">Entregues</option>
+    <option value="Cancelado">Canceladas</option>
+  </select>
+</div>
+
   <div class="overflow-x-auto">
     <table class="w-full text-sm text-left border border-gray-200 rounded overflow-hidden">
       <thead class="bg-[#E3F2FD] text-[#003d66] text-sm font-semibold">
@@ -382,6 +413,26 @@ function login() {
     document.getElementById("loginScreen").style.display = "none";
     document.getElementById("app").classList.remove("hidden");
     document.getElementById("usuarioLogado").textContent = currentUser;
+  // Mostrar filtro apenas para admin ou mista
+  if (usuarios[currentUser]?.permissao === "admin" || usuarios[currentUser]?.permissao === "mista") {
+    document.getElementById("statusFilterContainer").classList.remove("hidden");
+  }
+
+  // Filtrar solicitações
+  const statusFilter = document.getElementById("statusFilter");
+  statusFilter.addEventListener("change", function() {
+    const selected = this.value;
+    const rows = document.querySelectorAll("#requestsTableBody tr");
+    rows.forEach(row => {
+      const statusText = row.cells[4].innerText.trim();
+      if (selected === "Todos" || statusText.includes(selected)) {
+        row.style.display = "";
+      } else {
+        row.style.display = "none";
+      }
+    });
+  });
+
   // Exibir badge de permissão no topo
   if (usuarios[currentUser]) {
     const perm = usuarios[currentUser].permissao;
