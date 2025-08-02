@@ -10,15 +10,42 @@ let currentUser = "";
 function login() {
   const u = document.getElementById("user").value.trim();
   const p = document.getElementById("pass").value.trim();
-  const validUsers = {
-  "admin": "2025",
-  "Sabino": "1234",
-  "Ricardo": "1234",
-  "Pablo": "1234",
-  "Simone": "1234",
-  "Vinicius": "1234",
-  "Teste": "123"
+  
+
+// Migrar usuários fixos para o localStorage se ainda não existirem
+let usuariosFixos = {
+  "admin": { senha: "2025", permissao: "admin" },
+  "Sabino": { senha: "1234", permissao: "mista" },
+  "Ricardo": { senha: "1234", permissao: "solicitante" },
+  "Pablo": { senha: "1234", permissao: "solicitante" },
+  "Simone": { senha: "1234", permissao: "solicitante" },
+  "Vinicius": { senha: "1234", permissao: "solicitante" },
+  "Teste": { senha: "123", permissao: "mista" }
 };
+
+let usuariosAtuais = JSON.parse(localStorage.getItem(usuariosKey)) || {};
+let alterado = false;
+for (let nome in usuariosFixos) {
+  if (!usuariosAtuais[nome]) {
+    usuariosAtuais[nome] = usuariosFixos[nome];
+    alterado = true;
+  }
+}
+if (alterado) {
+  localStorage.setItem(usuariosKey, JSON.stringify(usuariosAtuais));
+}
+
+// Usar sempre os usuários do localStorage para login
+let usuariosSalvos = JSON.parse(localStorage.getItem(usuariosKey)) || {};
+const validUsers = {};
+for (let nome in usuariosSalvos) {
+  validUsers[nome] = usuariosSalvos[nome].senha;
+}
+;
+for (let nome in usuariosSalvos) {
+  validUsers[nome] = usuariosSalvos[nome].senha;
+}
+
 
   if (validUsers[u] === p) {
     document.body.classList.remove("body-login");
@@ -452,15 +479,42 @@ let currentUser = "";
 function login() {
   const u = document.getElementById("user").value.trim();
   const p = document.getElementById("pass").value.trim();
-  const validUsers = {
-  "admin": "2025",
-  "Sabino": "1234",
-  "Ricardo": "1234",
-  "Pablo": "1234",
-  "Simone": "1234",
-  "Vinicius": "1234",
-  "Teste": "123"
+  
+
+// Migrar usuários fixos para o localStorage se ainda não existirem
+let usuariosFixos = {
+  "admin": { senha: "2025", permissao: "admin" },
+  "Sabino": { senha: "1234", permissao: "mista" },
+  "Ricardo": { senha: "1234", permissao: "solicitante" },
+  "Pablo": { senha: "1234", permissao: "solicitante" },
+  "Simone": { senha: "1234", permissao: "solicitante" },
+  "Vinicius": { senha: "1234", permissao: "solicitante" },
+  "Teste": { senha: "123", permissao: "mista" }
 };
+
+let usuariosAtuais = JSON.parse(localStorage.getItem(usuariosKey)) || {};
+let alterado = false;
+for (let nome in usuariosFixos) {
+  if (!usuariosAtuais[nome]) {
+    usuariosAtuais[nome] = usuariosFixos[nome];
+    alterado = true;
+  }
+}
+if (alterado) {
+  localStorage.setItem(usuariosKey, JSON.stringify(usuariosAtuais));
+}
+
+// Usar sempre os usuários do localStorage para login
+let usuariosSalvos = JSON.parse(localStorage.getItem(usuariosKey)) || {};
+const validUsers = {};
+for (let nome in usuariosSalvos) {
+  validUsers[nome] = usuariosSalvos[nome].senha;
+}
+;
+for (let nome in usuariosSalvos) {
+  validUsers[nome] = usuariosSalvos[nome].senha;
+}
+
 
   if (validUsers[u] === p) {
     document.body.classList.remove("body-login");
