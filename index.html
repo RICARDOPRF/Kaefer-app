@@ -153,6 +153,51 @@ function abrirConfiguracoes() {
   window.open("configuracoes.html", "_blank");
 }
 
+
+function adicionarAoHistorico(id, material, qtd, prioridade, status, solicitante, dataSolicitacao, dataEntrega) {
+    const historicoTableBody = document.getElementById("historicoTableBody");
+    const historicoRow = historicoTableBody.insertRow();
+    historicoRow.insertCell(0).textContent = id;
+    historicoRow.insertCell(1).textContent = material;
+    historicoRow.insertCell(2).textContent = qtd;
+    historicoRow.insertCell(3).textContent = prioridade;
+    historicoRow.insertCell(4).innerHTML = status;
+    historicoRow.insertCell(5).textContent = solicitante;
+    historicoRow.insertCell(6).textContent = dataSolicitacao || "";
+    historicoRow.insertCell(7).textContent = (status.includes("Entregue") && dataEntrega) ? dataEntrega : "";
+    historicoRow.insertCell(historicoRow.cells.length).innerHTML = '<button onclick="concluir(this)">✔</button> <button onclick="excluir(this)">✖</button>';
+}
+
+
+function adicionarLinhaTabelaPrincipal(id, material, qtd, prioridade, status, solicitante, dataSolicitacao, dataEntrega) {
+    const tableBody = document.getElementById("tabelaSolicitacoesBody");
+    const newRow = tableBody.insertRow();
+    newRow.insertCell(0).textContent = id;
+    newRow.insertCell(1).textContent = material;
+    newRow.insertCell(2).textContent = qtd;
+    newRow.insertCell(3).textContent = prioridade;
+    newRow.insertCell(4).innerHTML = status;
+    newRow.insertCell(5).textContent = solicitante;
+    newRow.insertCell(6).textContent = dataSolicitacao;
+    newRow.insertCell(7).textContent = dataEntrega || "";
+    newRow.insertCell(8).innerHTML = '<button onclick="concluir(this)">✔</button> <button onclick="excluir(this)">✖</button>';
+}
+
+
+function adicionarLinhaHistorico(id, material, qtd, prioridade, status, solicitante, dataSolicitacao, dataEntrega) {
+    const historicoTableBody = document.getElementById("historicoTableBody");
+    const historicoRow = historicoTableBody.insertRow();
+    historicoRow.insertCell(0).textContent = id;
+    historicoRow.insertCell(1).textContent = material;
+    historicoRow.insertCell(2).textContent = qtd;
+    historicoRow.insertCell(3).textContent = prioridade;
+    historicoRow.insertCell(4).innerHTML = status;
+    historicoRow.insertCell(5).textContent = solicitante;
+    historicoRow.insertCell(6).textContent = dataSolicitacao;
+    historicoRow.insertCell(7).textContent = (status.includes("Entregue") && dataEntrega) ? dataEntrega : "";
+    historicoRow.insertCell(8).innerHTML = '<button onclick="concluir(this)">✔</button> <button onclick="excluir(this)">✖</button>';
+}
+
 </script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
@@ -319,7 +364,7 @@ function abrirConfiguracoes() {
           <th class="py-2 px-3 border-b border-gray-300">Prioridade</th>
           <th class="py-2 px-3 border-b border-gray-300">Status</th>
           <th class="py-2 px-3 border-b border-gray-300">Solicitante</th>
-          <th class="py-2 px-3 border-b border-gray-300">Data</th>
+          <th class="py-2 px-3 border-b border-gray-300">Data Solicitação</th><th class="py-2 px-3 border-b border-gray-300">Data Finalização</th>
           <th class="py-2 px-3 border-b border-gray-300">Ações</th>
         </tr>
       </thead>
@@ -331,6 +376,22 @@ function abrirConfiguracoes() {
   </div>
 
 <script>
+
+function formatarDataPadrao(dateObj) {
+    return dateObj.toLocaleString("pt-BR", { 
+        day: "2-digit", month: "2-digit", year: "numeric", 
+        hour: "2-digit", minute: "2-digit" 
+    });
+}
+
+
+function formatarData(dataObj) {
+    return dataObj.toLocaleString("pt-BR", { 
+        day: "2-digit", month: "2-digit", year: "numeric", 
+        hour: "2-digit", minute: "2-digit" 
+    });
+}
+
 let materiais = JSON.parse(localStorage.getItem("materiais")) || {
 "C90322011-6": {quantidade: 2, descricao: "CURVA 90 GR RL AI ASTM A403 WP304L-W SCH 40S ANSI B16.9", location: "Almoxarifado, Prateleira 1", unit: "Pç", weight: "10.1 kg"},
 "MLV004006-4x1": {quantidade: 1, descricao: "MEIA LUVA AI ASTM A182 F304L 3000# SW", location: "Almoxarifado, Prateleira 1", unit: "Pç", weight: "0.26 kg"},
@@ -415,8 +476,7 @@ document.getElementById("solicitacaoForm").addEventListener("submit", function (
   const tr = document.createElement("tr");
   const id = Math.floor(Math.random() * 10000);
   tr.innerHTML = `<td>${id}</td><td>${m}</td><td>${q}</td><td>${p}</td>
-  <td>Pendente</td><td>${s}</td><td>${new Date().toLocaleString()}</td>
-  <td><button onclick="concluir(this)">✔</button> <button onclick="excluir(this)">✖</button></td>`;
+  <td>Pendente</td><td>${s}</td><td>${new Date().toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" })}</td><td></td><td><button onclick="concluir(this)">✔</button> <button onclick="excluir(this)">✖</button></td>`;
   tbody.appendChild(tr);
   localStorage.setItem("solicitacoes", tbody.innerHTML);
   showFeedback("Solicitação enviada com sucesso!", "bg-green-100", "text-green-700");
@@ -429,26 +489,29 @@ document.getElementById("solicitacaoForm").addEventListener("submit", function (
 });
 
 function concluir(btn) {
-  if (!(usuarios[currentUser]?.permissao === "admin" || usuarios[currentUser]?.permissao === "mista")) return;
+
+  const agoraEntrega = new Date();
+  const dataEntrega = formatarData(agoraEntrega);
   const row = btn.closest("tr");
-  const codigo = row.cells[1].innerText.trim();
-  const quantidade = parseInt(row.cells[2].innerText);
-  if (materiais[codigo]) {
-    materiais[codigo].quantidade -= quantidade;
-    populateMaterialDropdown();
-  document.getElementById("solicitante").value = currentUser;
-  }
+  // Atualiza status
   row.cells[4].innerHTML = '<span class="text-green-700"><i class="fa-solid fa-check-circle"></i> Entregue</span>';
-  row.classList.add("bg-green-100");
-  [...row.querySelectorAll("button")].forEach(b => {
-    b.disabled = true;
-    b.classList.add("opacity-50");
-  });
-  showFeedback("Solicitação concluída!", "bg-green-100", "text-green-800");
-  localStorage.setItem("solicitacoes", document.getElementById("requestsTableBody").innerHTML);
+  row.style.backgroundColor = "#d4edda";
+  // Atualiza apenas a coluna "Data Entrega" (índice 7)
+  if (row.cells.length >= 8) {
+      row.cells[7].textContent = dataEntrega;
+  
+  // Desativar botão de cancelar (✖) na mesma linha após entrega
+  const cancelBtn = btn.parentElement.querySelector('button:nth-child(2)');
+  if (cancelBtn) {
+      cancelBtn.disabled = true;
+      cancelBtn.style.opacity = "0.5";
+      cancelBtn.style.cursor = "not-allowed";
+  }
+}
 }
 
 function excluir(btn) {
+
   if (!(usuarios[currentUser]?.permissao === "admin" || usuarios[currentUser]?.permissao === "mista")) return;
   const row = btn.closest("tr");
   row.cells[4].innerHTML = '<span class="text-red-700"><i class="fa-solid fa-times-circle"></i> Cancelado</span>';
@@ -456,7 +519,18 @@ function excluir(btn) {
   [...row.querySelectorAll("button")].forEach(b => {
     b.disabled = true;
     b.classList.add("opacity-50");
+  
+  // Registrar Data Finalização ao cancelar
+  const agoraCancel = new Date();
+  const dataCancel = agoraCancel.toLocaleString("pt-BR", { 
+      day: "2-digit", month: "2-digit", year: "numeric", 
+      hour: "2-digit", minute: "2-digit" 
   });
+  const row = btn.closest("tr");
+  if (row.cells.length >= 8) {
+      row.cells[7].textContent = dataCancel;
+  }
+});
   showFeedback("Solicitação cancelada.", "bg-red-100", "text-red-800");
   localStorage.setItem("solicitacoes", document.getElementById("requestsTableBody").innerHTML);
 }
@@ -622,6 +696,51 @@ function abrirConfiguracoes() {
   window.open("configuracoes.html", "_blank");
 }
 
+
+function adicionarAoHistorico(id, material, qtd, prioridade, status, solicitante, dataSolicitacao, dataEntrega) {
+    const historicoTableBody = document.getElementById("historicoTableBody");
+    const historicoRow = historicoTableBody.insertRow();
+    historicoRow.insertCell(0).textContent = id;
+    historicoRow.insertCell(1).textContent = material;
+    historicoRow.insertCell(2).textContent = qtd;
+    historicoRow.insertCell(3).textContent = prioridade;
+    historicoRow.insertCell(4).innerHTML = status;
+    historicoRow.insertCell(5).textContent = solicitante;
+    historicoRow.insertCell(6).textContent = dataSolicitacao || "";
+    historicoRow.insertCell(7).textContent = (status.includes("Entregue") && dataEntrega) ? dataEntrega : "";
+    historicoRow.insertCell(historicoRow.cells.length).innerHTML = '<button onclick="concluir(this)">✔</button> <button onclick="excluir(this)">✖</button>';
+}
+
+
+function adicionarLinhaTabelaPrincipal(id, material, qtd, prioridade, status, solicitante, dataSolicitacao, dataEntrega) {
+    const tableBody = document.getElementById("tabelaSolicitacoesBody");
+    const newRow = tableBody.insertRow();
+    newRow.insertCell(0).textContent = id;
+    newRow.insertCell(1).textContent = material;
+    newRow.insertCell(2).textContent = qtd;
+    newRow.insertCell(3).textContent = prioridade;
+    newRow.insertCell(4).innerHTML = status;
+    newRow.insertCell(5).textContent = solicitante;
+    newRow.insertCell(6).textContent = dataSolicitacao;
+    newRow.insertCell(7).textContent = dataEntrega || "";
+    newRow.insertCell(8).innerHTML = '<button onclick="concluir(this)">✔</button> <button onclick="excluir(this)">✖</button>';
+}
+
+
+function adicionarLinhaHistorico(id, material, qtd, prioridade, status, solicitante, dataSolicitacao, dataEntrega) {
+    const historicoTableBody = document.getElementById("historicoTableBody");
+    const historicoRow = historicoTableBody.insertRow();
+    historicoRow.insertCell(0).textContent = id;
+    historicoRow.insertCell(1).textContent = material;
+    historicoRow.insertCell(2).textContent = qtd;
+    historicoRow.insertCell(3).textContent = prioridade;
+    historicoRow.insertCell(4).innerHTML = status;
+    historicoRow.insertCell(5).textContent = solicitante;
+    historicoRow.insertCell(6).textContent = dataSolicitacao;
+    historicoRow.insertCell(7).textContent = (status.includes("Entregue") && dataEntrega) ? dataEntrega : "";
+    historicoRow.insertCell(8).innerHTML = '<button onclick="concluir(this)">✔</button> <button onclick="excluir(this)">✖</button>';
+}
+
 </script>
 
 <script>
@@ -646,6 +765,51 @@ window.onload = function() {
   if (saved) document.getElementById("requestsTableBody").innerHTML = saved;
   aplicarTempos();
 };
+
+function adicionarAoHistorico(id, material, qtd, prioridade, status, solicitante, dataSolicitacao, dataEntrega) {
+    const historicoTableBody = document.getElementById("historicoTableBody");
+    const historicoRow = historicoTableBody.insertRow();
+    historicoRow.insertCell(0).textContent = id;
+    historicoRow.insertCell(1).textContent = material;
+    historicoRow.insertCell(2).textContent = qtd;
+    historicoRow.insertCell(3).textContent = prioridade;
+    historicoRow.insertCell(4).innerHTML = status;
+    historicoRow.insertCell(5).textContent = solicitante;
+    historicoRow.insertCell(6).textContent = dataSolicitacao || "";
+    historicoRow.insertCell(7).textContent = (status.includes("Entregue") && dataEntrega) ? dataEntrega : "";
+    historicoRow.insertCell(historicoRow.cells.length).innerHTML = '<button onclick="concluir(this)">✔</button> <button onclick="excluir(this)">✖</button>';
+}
+
+
+function adicionarLinhaTabelaPrincipal(id, material, qtd, prioridade, status, solicitante, dataSolicitacao, dataEntrega) {
+    const tableBody = document.getElementById("tabelaSolicitacoesBody");
+    const newRow = tableBody.insertRow();
+    newRow.insertCell(0).textContent = id;
+    newRow.insertCell(1).textContent = material;
+    newRow.insertCell(2).textContent = qtd;
+    newRow.insertCell(3).textContent = prioridade;
+    newRow.insertCell(4).innerHTML = status;
+    newRow.insertCell(5).textContent = solicitante;
+    newRow.insertCell(6).textContent = dataSolicitacao;
+    newRow.insertCell(7).textContent = dataEntrega || "";
+    newRow.insertCell(8).innerHTML = '<button onclick="concluir(this)">✔</button> <button onclick="excluir(this)">✖</button>';
+}
+
+
+function adicionarLinhaHistorico(id, material, qtd, prioridade, status, solicitante, dataSolicitacao, dataEntrega) {
+    const historicoTableBody = document.getElementById("historicoTableBody");
+    const historicoRow = historicoTableBody.insertRow();
+    historicoRow.insertCell(0).textContent = id;
+    historicoRow.insertCell(1).textContent = material;
+    historicoRow.insertCell(2).textContent = qtd;
+    historicoRow.insertCell(3).textContent = prioridade;
+    historicoRow.insertCell(4).innerHTML = status;
+    historicoRow.insertCell(5).textContent = solicitante;
+    historicoRow.insertCell(6).textContent = dataSolicitacao;
+    historicoRow.insertCell(7).textContent = (status.includes("Entregue") && dataEntrega) ? dataEntrega : "";
+    historicoRow.insertCell(8).innerHTML = '<button onclick="concluir(this)">✔</button> <button onclick="excluir(this)">✖</button>';
+}
+
 </script>
 
 
@@ -846,6 +1010,51 @@ window.onload = function() {
   aplicarTempos();
   listarUsuarios();
 };
+
+
+function adicionarAoHistorico(id, material, qtd, prioridade, status, solicitante, dataSolicitacao, dataEntrega) {
+    const historicoTableBody = document.getElementById("historicoTableBody");
+    const historicoRow = historicoTableBody.insertRow();
+    historicoRow.insertCell(0).textContent = id;
+    historicoRow.insertCell(1).textContent = material;
+    historicoRow.insertCell(2).textContent = qtd;
+    historicoRow.insertCell(3).textContent = prioridade;
+    historicoRow.insertCell(4).innerHTML = status;
+    historicoRow.insertCell(5).textContent = solicitante;
+    historicoRow.insertCell(6).textContent = dataSolicitacao || "";
+    historicoRow.insertCell(7).textContent = (status.includes("Entregue") && dataEntrega) ? dataEntrega : "";
+    historicoRow.insertCell(historicoRow.cells.length).innerHTML = '<button onclick="concluir(this)">✔</button> <button onclick="excluir(this)">✖</button>';
+}
+
+
+function adicionarLinhaTabelaPrincipal(id, material, qtd, prioridade, status, solicitante, dataSolicitacao, dataEntrega) {
+    const tableBody = document.getElementById("tabelaSolicitacoesBody");
+    const newRow = tableBody.insertRow();
+    newRow.insertCell(0).textContent = id;
+    newRow.insertCell(1).textContent = material;
+    newRow.insertCell(2).textContent = qtd;
+    newRow.insertCell(3).textContent = prioridade;
+    newRow.insertCell(4).innerHTML = status;
+    newRow.insertCell(5).textContent = solicitante;
+    newRow.insertCell(6).textContent = dataSolicitacao;
+    newRow.insertCell(7).textContent = dataEntrega || "";
+    newRow.insertCell(8).innerHTML = '<button onclick="concluir(this)">✔</button> <button onclick="excluir(this)">✖</button>';
+}
+
+
+function adicionarLinhaHistorico(id, material, qtd, prioridade, status, solicitante, dataSolicitacao, dataEntrega) {
+    const historicoTableBody = document.getElementById("historicoTableBody");
+    const historicoRow = historicoTableBody.insertRow();
+    historicoRow.insertCell(0).textContent = id;
+    historicoRow.insertCell(1).textContent = material;
+    historicoRow.insertCell(2).textContent = qtd;
+    historicoRow.insertCell(3).textContent = prioridade;
+    historicoRow.insertCell(4).innerHTML = status;
+    historicoRow.insertCell(5).textContent = solicitante;
+    historicoRow.insertCell(6).textContent = dataSolicitacao;
+    historicoRow.insertCell(7).textContent = (status.includes("Entregue") && dataEntrega) ? dataEntrega : "";
+    historicoRow.insertCell(8).innerHTML = '<button onclick="concluir(this)">✔</button> <button onclick="excluir(this)">✖</button>';
+}
 
 </script>
 
