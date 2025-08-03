@@ -4,129 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Solicitação de Materiais - KAEFER Teckma Engenharia</title>
-    <script src="https://cdn.tailwindcss.com">
-let currentUser = "";
-
-function login() {
-  const u = document.getElementById("user").value.trim();
-  const p = document.getElementById("pass").value.trim();
-  const validUsers = {
-  "admin": "2025",
-  "Sabino": "1234",
-  "Ricardo": "1234",
-  "Pablo": "1234",
-  "Simone": "1234",
-  "Vinicius": "1234",
-  "Teste": "123"
-};
-
-  if (validUsers[u] === p) {
-    document.body.classList.remove("body-login");
-    currentUser = u;
-    document.getElementById("loginScreen").style.display = "none";
-    document.getElementById("app").classList.remove("hidden");
-    document.getElementById("usuarioLogado").textContent = currentUser;
-  // Mostrar filtro apenas para admin ou mista
-  if (usuarios[currentUser]?.permissao === "admin" || usuarios[currentUser]?.permissao === "mista") {
-    document.getElementById("statusFilterContainer").classList.remove("hidden");
-  }
-
-  // Filtrar solicitações
-  const statusFilter = document.getElementById("statusFilter");
-  statusFilter.addEventListener("change", function() {
-    const selected = this.value;
-    const rows = document.querySelectorAll("#requestsTableBody tr");
-    rows.forEach(row => {
-      const statusText = row.cells[4].innerText.trim();
-      if (selected === "Todos" || statusText.includes(selected)) {
-        row.style.display = "";
-      } else {
-        row.style.display = "none";
-      }
-    });
-  });
-
-  // Exibir badge de permissão no topo
-  if (usuarios[currentUser]) {
-    const perm = usuarios[currentUser].permissao;
-    const badge = document.getElementById("badgePermissao");
-    if (perm === "admin") {
-      badge.textContent = "Admin";
-      badge.className += " bg-red-100 text-red-800";
-    } else if (perm === "mista") {
-      badge.textContent = "Mista";
-      badge.className += " bg-purple-100 text-purple-800";
-    } else {
-      badge.textContent = "Solicitante";
-      badge.className += " bg-blue-100 text-blue-800";
-    }
-  }
-
-    document.getElementById("solicitante").value = currentUser;
-  } else {
-    document.getElementById("loginError").classList.remove("hidden");
-  }
-}
-
-
-function logout() {
-  location.reload();
-}
-
-
-function abrirAdicionarEstoque() {
-  if (usuarios[currentUser]?.permissao === "admin" || usuarios[currentUser]?.permissao === "mista") {
-    document.getElementById("estoqueScreen").classList.remove("hidden");
-  } else {
-    alert("Você não tem permissão para adicionar estoque.");
-  }
-}
-function fecharAdicionarEstoque() {
-  document.getElementById("estoqueScreen").classList.add("hidden");
-}
-function salvarNovoEstoque() {
-  const codigo = document.getElementById("novoCodigo").value.trim();
-  const descricao = document.getElementById("novaDescricao").value.trim();
-  const quantidade = parseInt(document.getElementById("novaQuantidade").value.trim());
-  const unidade = document.getElementById("novaUnidade").value.trim();
-  const localizacao = document.getElementById("novaLocalizacao").value.trim();
-  const peso = document.getElementById("novoPeso").value.trim();
-
-  if (!codigo || !descricao || !quantidade || !unidade || !localizacao || !peso) {
-    alert("Preencha todos os campos.");
-    return;
-  }
-  if (materiais[codigo]) {
-    alert("Já existe um material com esse código.");
-    return;
-  }
-
-  materiais[codigo] = {
-    quantidade: quantidade,
-    descricao: descricao,
-    unit: unidade,
-    location: localizacao,
-    weight: peso
-  };
-
-  localStorage.setItem("materiais", JSON.stringify(materiais));
-  populateMaterialDropdown();
-  fecharAdicionarEstoque();
-  showFeedback("Material adicionado com sucesso!", "bg-green-100", "text-green-700");
-
-  document.getElementById("novoCodigo").value = "";
-  document.getElementById("novaDescricao").value = "";
-  document.getElementById("novaQuantidade").value = "";
-  document.getElementById("novaUnidade").value = "";
-  document.getElementById("novaLocalizacao").value = "";
-  document.getElementById("novoPeso").value = "";
-}
-
-function abrirConfiguracoes() {
-  window.open("configuracoes.html", "_blank");
-}
-
-</script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -137,44 +15,38 @@ function abrirConfiguracoes() {
             --kaefer-green: #388E3C;
         }
 
+        /* Estilos originais para prioridade/status */
         .priority-high { background-color: #f8caca !important; color: var(--kaefer-red); }
         .priority-medium { background-color: #fff3cd !important; color: #856404; }
         .priority-low { background-color: #d4edda !important; color: #155724; }
 
+        /* Estilos para scrollbar */
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         ::-webkit-scrollbar-track { background: #f1f1f1; }
         ::-webkit-scrollbar-thumb { background: var(--kaefer-blue); }
         ::-webkit-scrollbar-thumb:hover { background: var(--kaefer-blue-dark); }
 
+        /* Animação (se usada) */
         @keyframes slideIn {
             from { transform: translateY(-20px); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
         }
-
         .slide-in { animation: slideIn 0.3s ease-out; }
-    
-.body-login {
-  overflow: hidden;
-  height: 100vh;
-}
 
-</style>
+        /* Estilo para tela de login */
+        .body-login { overflow: hidden; height: 100vh; }
+    </style>
 </head>
 <body class="bg-gray-50">
-
-<div class="hidden"></div>
-
-    
-
 
 <!-- Login Screen com imagem de fundo -->
 <div id="loginScreen" class="relative bg-cover bg-center flex items-center justify-center" style="background-image: url('https://i.postimg.cc/tC067ZNG/TKLOGIN-Obra.png'); height: 100vh; overflow: hidden;">
   <div class="bg-white/80 shadow-lg rounded-lg p-8 w-full max-w-sm text-center backdrop-blur-sm">
-    <img class="opacity-80 drop-shadow-sm" src="https://placehold.co/300x100/0072B8/FFFFFF?text=KAEFER+Teckma" alt="Logo" class="mx-auto mb-6 h-20">
+    <img class="opacity-80 drop-shadow-sm" src="https://www.kaeferteckma.com.br/2019/wp-content/uploads/2024/05/KTE_Logo_RGB-transp-.png" alt="Logo KAEFER Teckma" class="mx-auto mb-6 h-20">
     <h1 class="text-xl font-bold text-gray-800 mb-4">Acesso ao Sistema</h1>
     <input id="user" type="text" placeholder="Usuário" class="border border-gray-300 p-2 mb-3 w-full rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
     <input id="pass" type="password" placeholder="Senha" class="border border-gray-300 p-2 mb-4 w-full rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
-    <button onclick="login()" class="bg-[#0072B8] hover:bg-[#005a91] text-white px-4 py-2 rounded w-full font-semibold">Entrar</button>
+    <button id="btnLogin" class="bg-[#0072B8] hover:bg-[#005a91] text-white px-4 py-2 rounded w-full font-semibold">Entrar</button>
     <p id="loginError" class="text-red-600 mt-3 hidden text-sm">Usuário ou senha inválidos</p>
   </div>
 </div>
@@ -292,7 +164,7 @@ function abrirConfiguracoes() {
           <th class="py-2 px-3 border-b border-gray-300">Prioridade</th>
           <th class="py-2 px-3 border-b border-gray-300">Status</th>
           <th class="py-2 px-3 border-b border-gray-300">Solicitante</th>
-          <th class="py-2 px-3 border-b border-gray-300">Data</th>
+          <th class="py-2 px-3 border-b border-gray-300">Data Solicitação</th><th class="py-2 px-3 border-b border-gray-300">Data Finalização</th>
           <th class="py-2 px-3 border-b border-gray-300">Ações</th>
         </tr>
       </thead>
@@ -302,298 +174,6 @@ function abrirConfiguracoes() {
 </div>
 
   </div>
-
-<script>
-let materiais = JSON.parse(localStorage.getItem("materiais")) || {
-"C90322011-6": {quantidade: 2, descricao: "CURVA 90 GR RL AI ASTM A403 WP304L-W SCH 40S ANSI B16.9", location: "Almoxarifado, Prateleira 1", unit: "Pç", weight: "10.1 kg"},
-"MLV004006-4x1": {quantidade: 1, descricao: "MEIA LUVA AI ASTM A182 F304L 3000# SW", location: "Almoxarifado, Prateleira 1", unit: "Pç", weight: "0.26 kg"},
-"REC122017-3X11/4": {quantidade: 1, descricao: "RED CONC AI A403 CR304L SCH 5S MSS SP43", location: "Almoxarifado, Prateleira 1", unit: "Pç", weight: "0.34 kg"},
-"TUB315019-14": {quantidade: 2205, descricao: "TUBO AI ASTM A358 TP304L CL2 C/C SCH 5S ANSI B36.19", location: "Almoxarifado, Prateleira 1", unit: "mm", weight: "60.15 kg"},
-"TUB005009-2": {quantidade: 749, descricao: "TUBO AC ASTM A106 GR B S/C SCH 40", location: "Almoxarifado, Prateleira 1", unit: "mm", weight: "1.62 kg"},
-"MLV001006-1": {quantidade: 1, descricao: "MEIA LUVA AC ASTM A105 3000# SW B16.11", location: "Almoxarifado, Prateleira 1", unit: "Pç", weight: "0.26 kg"},
-"C45122014-12": {quantidade: 1, descricao: "CURVA 45 GR RL A403 CR304L SCH 5S MSS SP43", location: "Almoxarifado, Prateleira 1", unit: "Pç", weight: "9.65 kg"},
-"TUB115008-11/2": {quantidade: 75069, descricao: "TUBO AI ASTM A312 TP304L C/C SCH 5S ANSI B36.19", location: "Almoxarifado, Prateleira 1", unit: "mm", weight: "2.5 kg"},
-"C90195005-11/2": {quantidade: 18, descricao: "CURVA 90 GR RL AI ASTM A403 CR304L SCH5S MSS SP43", location: "Almoxarifado, Prateleira 1", unit: "Pç", weight: "0.62 kg"},
-"FG8009017-10": {quantidade: 1, descricao: "FIGURA OITO AI ASTM A240 304L 300# CONF B33014-0052", location: "Almoxarifado, Prateleira 1", unit: "Pç", weight: "0.0 kg"},
-"C90196008-3": {quantidade: 1, descricao: "CURVA 90 GR RL AI A403 CR304L 10S MSS SP43", location: "Almoxarifado, Prateleira 8", unit: "Pç", weight: "1.16 kg"},
-  "FST001011-6": {quantidade: 1, descricao: "FLANGE SOLTO AC ASTM A105 150# B16.5 ZINCADO A FOGO", location: "Almoxarifado, Prateleira 12", unit: "Pç", weight: "8.6 kg"},
-  "TUB298020-16": {quantidade: 974, descricao: "TUBO AI ASTM A358 TP304L CL2 C/C SCH STD ASME B36.19", location: "Almoxarifado, Prateleira 5", unit: "mm", weight: "258.32 kg"},
-  "FPE096012-8": {quantidade: 2, descricao: "FLANGE PESC AC ASTM A105 300# SCH 40 ANSI B16.5", location: "Almoxarifado, Prateleira 1", unit: "Pç", weight: "31.3 kg"},
-  "PES196009-4": {quantidade: 8, descricao: "PESTANA AI ASTM A403 GR WP304L-W SCH 40S MSS SP43", location: "Almoxarifado, Prateleira 1", unit: "Pç", weight: "1.81 kg"},
-  "FST002009-4": {quantidade: 8, descricao: "FLANGE SOLTO AC ASTM A105 300#", location: "Almoxarifado, Prateleira 1", unit: "Pç", weight: "10.9 kg"},
-  "TUB050009-2": {quantidade: 96016, descricao: "TUBO AI ASTM A312 TP304L C/C SCH 40S", location: "Almoxarifado, Prateleira 1", unit: "mm", weight: "1.51 kg"},
-  "TUB115013-4": {quantidade: 34695, descricao: "TUBO AI ASTM A312 TP304L C/C SCH 5S ANSI B36.19", location: "Almoxarifado, Prateleira 1", unit: "mm", weight: "504.0 kg"}
-};
-
-function populateMaterialDropdown() {
-  const matSel = document.getElementById("material");
-  matSel.innerHTML = "";
-  for (let code in materiais) {
-    const m = materiais[code];
-    const opt = document.createElement("option");
-    opt.value = code;
-    opt.textContent = `${code} - ${m.descricao}`;
-    opt.dataset.stock = m.quantidade;
-    opt.dataset.location = m.location;
-    opt.dataset.unit = m.unit;
-    opt.dataset.weight = m.weight;
-    matSel.appendChild(opt);
-  }
-}
-
-document.getElementById("materialSearch").addEventListener("input", function () {
-  const termo = this.value.toLowerCase();
-  [...document.getElementById("material").options].forEach(opt => {
-    opt.style.display = opt.textContent.toLowerCase().includes(termo) ? "" : "none";
-  });
-});
-
-document.getElementById("material").addEventListener("change", function () {
-  const opt = this.selectedOptions[0];
-  if (opt) {
-    document.getElementById("estoqueInfo").textContent = `${opt.dataset.stock} ${opt.dataset.unit} (${opt.dataset.weight})`;
-    document.getElementById("localizacao").textContent = opt.dataset.location;
-  }
-  validateForm();
-});
-
-document.getElementById("quantidade").addEventListener("input", validateForm);
-
-document.getElementById("increaseQty").onclick = () => {
-  const q = document.getElementById("quantidade");
-  q.value = parseInt(q.value) + 1;
-  validateForm();
-};
-
-document.getElementById("decreaseQty").onclick = () => {
-  const q = document.getElementById("quantidade");
-  if (parseInt(q.value) > 1) q.value = parseInt(q.value) - 1;
-  validateForm();
-};
-
-function validateForm() {
-  const m = document.getElementById("material").value;
-  const q = parseInt(document.getElementById("quantidade").value);
-  const s = parseInt(document.getElementById("material").selectedOptions[0]?.dataset.stock || 0);
-  document.getElementById("btnSolicitar").disabled = !(m && q > 0 && q <= s);
-}
-
-document.getElementById("solicitacaoForm").addEventListener("submit", function (e) {
-  e.preventDefault();
-  const s = document.getElementById("solicitante").value;
-  const m = document.getElementById("material").value;
-  const q = document.getElementById("quantidade").value;
-  const p = document.getElementById("prioridade").value;
-  const tbody = document.getElementById("requestsTableBody");
-  const tr = document.createElement("tr");
-  const id = Math.floor(Math.random() * 10000);
-  tr.innerHTML = `<td>${id}</td><td>${m}</td><td>${q}</td><td>${p}</td>
-  <td>Pendente</td><td>${s}</td><td>${new Date().toLocaleString()}</td>
-  <td><button onclick="concluir(this)">✔</button> <button onclick="excluir(this)">✖</button></td>`;
-  tbody.appendChild(tr);
-  localStorage.setItem("solicitacoes", tbody.innerHTML);
-  showFeedback("Solicitação enviada com sucesso!", "bg-green-100", "text-green-700");
-  this.reset();
-  document.getElementById("estoqueInfo").textContent = "--";
-  document.getElementById("localizacao").textContent = "--";
-  populateMaterialDropdown();
-  document.getElementById("solicitante").value = currentUser;
-  validateForm();
-});
-
-function concluir(btn) {
-  if (!(usuarios[currentUser]?.permissao === "admin" || usuarios[currentUser]?.permissao === "mista")) return;
-  const row = btn.closest("tr");
-  const codigo = row.cells[1].innerText.trim();
-  const quantidade = parseInt(row.cells[2].innerText);
-  if (materiais[codigo]) {
-    materiais[codigo].quantidade -= quantidade;
-    populateMaterialDropdown();
-  document.getElementById("solicitante").value = currentUser;
-  }
-  row.cells[4].innerHTML = '<span class="text-green-700"><i class="fa-solid fa-check-circle"></i> Entregue</span>';
-  row.classList.add("bg-green-100");
-  [...row.querySelectorAll("button")].forEach(b => {
-    b.disabled = true;
-    b.classList.add("opacity-50");
-  });
-  showFeedback("Solicitação concluída!", "bg-green-100", "text-green-800");
-  localStorage.setItem("solicitacoes", document.getElementById("requestsTableBody").innerHTML);
-}
-
-function excluir(btn) {
-  if (!(usuarios[currentUser]?.permissao === "admin" || usuarios[currentUser]?.permissao === "mista")) return;
-  const row = btn.closest("tr");
-  row.cells[4].innerHTML = '<span class="text-red-700"><i class="fa-solid fa-times-circle"></i> Cancelado</span>';
-  row.classList.add("bg-red-100");
-  [...row.querySelectorAll("button")].forEach(b => {
-    b.disabled = true;
-    b.classList.add("opacity-50");
-  });
-  showFeedback("Solicitação cancelada.", "bg-red-100", "text-red-800");
-  localStorage.setItem("solicitacoes", document.getElementById("requestsTableBody").innerHTML);
-}
-
-function showFeedback(msg, bg, text) {
-  const fb = document.getElementById("feedback");
-  fb.textContent = msg;
-  fb.className = `block p-3 rounded ${bg} ${text}`;
-}
-window.onload = function() {
-  document.body.classList.add("body-login");
-  populateMaterialDropdown();
-  document.getElementById("solicitante").value = currentUser;
-  const saved = localStorage.getItem("solicitacoes");
-  if (saved) document.getElementById("requestsTableBody").innerHTML = saved;
-};
-
-let currentUser = "";
-
-function login() {
-  const u = document.getElementById("user").value.trim();
-  const p = document.getElementById("pass").value.trim();
-  const validUsers = {
-  "admin": "2025",
-  "Sabino": "1234",
-  "Ricardo": "1234",
-  "Pablo": "1234",
-  "Simone": "1234",
-  "Vinicius": "1234",
-  "Teste": "123"
-};
-
-  if (validUsers[u] === p) {
-    document.body.classList.remove("body-login");
-    currentUser = u;
-    document.getElementById("loginScreen").style.display = "none";
-    document.getElementById("app").classList.remove("hidden");
-    document.getElementById("usuarioLogado").textContent = currentUser;
-  // Mostrar filtro apenas para admin ou mista
-  if (usuarios[currentUser]?.permissao === "admin" || usuarios[currentUser]?.permissao === "mista") {
-    document.getElementById("statusFilterContainer").classList.remove("hidden");
-  }
-
-  // Filtrar solicitações
-  const statusFilter = document.getElementById("statusFilter");
-  statusFilter.addEventListener("change", function() {
-    const selected = this.value;
-    const rows = document.querySelectorAll("#requestsTableBody tr");
-    rows.forEach(row => {
-      const statusText = row.cells[4].innerText.trim();
-      if (selected === "Todos" || statusText.includes(selected)) {
-        row.style.display = "";
-      } else {
-        row.style.display = "none";
-      }
-    });
-  });
-
-  // Exibir badge de permissão no topo
-  if (usuarios[currentUser]) {
-    const perm = usuarios[currentUser].permissao;
-    const badge = document.getElementById("badgePermissao");
-    if (perm === "admin") {
-      badge.textContent = "Admin";
-      badge.className += " bg-red-100 text-red-800";
-    } else if (perm === "mista") {
-      badge.textContent = "Mista";
-      badge.className += " bg-purple-100 text-purple-800";
-    } else {
-      badge.textContent = "Solicitante";
-      badge.className += " bg-blue-100 text-blue-800";
-    }
-  }
-
-    document.getElementById("solicitante").value = currentUser;
-  } else {
-    document.getElementById("loginError").classList.remove("hidden");
-  }
-}
-
-
-function logout() {
-  location.reload();
-}
-
-
-function abrirAdicionarEstoque() {
-  if (usuarios[currentUser]?.permissao === "admin" || usuarios[currentUser]?.permissao === "mista") {
-    document.getElementById("estoqueScreen").classList.remove("hidden");
-  } else {
-    alert("Você não tem permissão para adicionar estoque.");
-  }
-}
-function fecharAdicionarEstoque() {
-  document.getElementById("estoqueScreen").classList.add("hidden");
-}
-function salvarNovoEstoque() {
-  const codigo = document.getElementById("novoCodigo").value.trim();
-  const descricao = document.getElementById("novaDescricao").value.trim();
-  const quantidade = parseInt(document.getElementById("novaQuantidade").value.trim());
-  const unidade = document.getElementById("novaUnidade").value.trim();
-  const localizacao = document.getElementById("novaLocalizacao").value.trim();
-  const peso = document.getElementById("novoPeso").value.trim();
-
-  if (!codigo || !descricao || !quantidade || !unidade || !localizacao || !peso) {
-    alert("Preencha todos os campos.");
-    return;
-  }
-  if (materiais[codigo]) {
-    alert("Já existe um material com esse código.");
-    return;
-  }
-
-  materiais[codigo] = {
-    quantidade: quantidade,
-    descricao: descricao,
-    unit: unidade,
-    location: localizacao,
-    weight: peso
-  };
-
-  localStorage.setItem("materiais", JSON.stringify(materiais));
-  populateMaterialDropdown();
-  fecharAdicionarEstoque();
-  showFeedback("Material adicionado com sucesso!", "bg-green-100", "text-green-700");
-
-  document.getElementById("novoCodigo").value = "";
-  document.getElementById("novaDescricao").value = "";
-  document.getElementById("novaQuantidade").value = "";
-  document.getElementById("novaUnidade").value = "";
-  document.getElementById("novaLocalizacao").value = "";
-  document.getElementById("novoPeso").value = "";
-}
-
-function abrirConfiguracoes() {
-  window.open("configuracoes.html", "_blank");
-}
-
-</script>
-
-<script>
-function aplicarTempos() {
-  const tempoAlta = localStorage.getItem("tempoAlta") || "Entrega imediata";
-  const tempoMedia = localStorage.getItem("tempoMedia") || "Entrega em 2 horas";
-  const tempoBaixa = localStorage.getItem("tempoBaixa") || "Entrega em 4 horas";
-
-  const prioridade = document.getElementById("prioridade");
-  if (prioridade && prioridade.options.length >= 3) {
-    prioridade.options[0].text = `Baixa (${tempoBaixa})`;
-    prioridade.options[1].text = `Média (${tempoMedia})`;
-    prioridade.options[2].text = `Alta (${tempoAlta})`;
-  }
-}
-
-window.onload = function() {
-  document.body.classList.add("body-login");
-  populateMaterialDropdown();
-  document.getElementById("solicitante").value = currentUser;
-  const saved = localStorage.getItem("solicitacoes");
-  if (saved) document.getElementById("requestsTableBody").innerHTML = saved;
-  aplicarTempos();
-};
-</script>
-
 
 <!-- Modal de Configuração Interna -->
 <div id="configScreen" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
@@ -649,153 +229,6 @@ window.onload = function() {
 </div>
 
 
-<script>
-
-function abrirAdicionarEstoque() {
-  if (usuarios[currentUser]?.permissao === "admin" || usuarios[currentUser]?.permissao === "mista") {
-    document.getElementById("estoqueScreen").classList.remove("hidden");
-  } else {
-    alert("Você não tem permissão para adicionar estoque.");
-  }
-}
-function fecharAdicionarEstoque() {
-  document.getElementById("estoqueScreen").classList.add("hidden");
-}
-function salvarNovoEstoque() {
-  const codigo = document.getElementById("novoCodigo").value.trim();
-  const descricao = document.getElementById("novaDescricao").value.trim();
-  const quantidade = parseInt(document.getElementById("novaQuantidade").value.trim());
-  const unidade = document.getElementById("novaUnidade").value.trim();
-  const localizacao = document.getElementById("novaLocalizacao").value.trim();
-  const peso = document.getElementById("novoPeso").value.trim();
-
-  if (!codigo || !descricao || !quantidade || !unidade || !localizacao || !peso) {
-    alert("Preencha todos os campos.");
-    return;
-  }
-  if (materiais[codigo]) {
-    alert("Já existe um material com esse código.");
-    return;
-  }
-
-  materiais[codigo] = {
-    quantidade: quantidade,
-    descricao: descricao,
-    unit: unidade,
-    location: localizacao,
-    weight: peso
-  };
-
-  localStorage.setItem("materiais", JSON.stringify(materiais));
-  populateMaterialDropdown();
-  fecharAdicionarEstoque();
-  showFeedback("Material adicionado com sucesso!", "bg-green-100", "text-green-700");
-
-  document.getElementById("novoCodigo").value = "";
-  document.getElementById("novaDescricao").value = "";
-  document.getElementById("novaQuantidade").value = "";
-  document.getElementById("novaUnidade").value = "";
-  document.getElementById("novaLocalizacao").value = "";
-  document.getElementById("novoPeso").value = "";
-}
-
-function abrirConfiguracoes() {
-  if (usuarios[currentUser]?.permissao !== "admin") {
-    alert("Apenas o usuário admin pode editar as configurações.");
-    return;
-  }
-  document.getElementById("configScreen").classList.remove("hidden");
-  document.getElementById("tempoAlta").value = localStorage.getItem("tempoAlta") || "Entrega imediata";
-  document.getElementById("tempoMedia").value = localStorage.getItem("tempoMedia") || "Entrega em 2 horas";
-  document.getElementById("tempoBaixa").value = localStorage.getItem("tempoBaixa") || "Entrega em 4 horas";
-}
-function fecharConfig() {
-  document.getElementById("configScreen").classList.add("hidden");
-}
-function salvarConfiguracoes() {
-  localStorage.setItem("tempoAlta", document.getElementById("tempoAlta").value);
-  localStorage.setItem("tempoMedia", document.getElementById("tempoMedia").value);
-  localStorage.setItem("tempoBaixa", document.getElementById("tempoBaixa").value);
-  aplicarTempos();
-  fecharConfig();
-}
-
-// Gerenciamento de Usuários
-const usuariosKey = "usuarios";
-let usuarios = JSON.parse(localStorage.getItem(usuariosKey)) || {
-  "admin": { senha: "2025", permissao: "admin" },
-  "Ricardo": { senha: "1234", permissao: "solicitante" },
-  "Sabino": { senha: "1234", permissao: "mista" },
-  "Teste": { senha: "123", permissao: "mista" }
-};
-
-function salvarUsuarios() {
-  localStorage.setItem(usuariosKey, JSON.stringify(usuarios));
-  listarUsuarios();
-}
-
-function listarUsuarios() {
-  const tbody = document.getElementById("tabelaUsuarios");
-  if (!tbody) return;
-  tbody.innerHTML = "";
-  Object.entries(usuarios).forEach(([user, info]) => {
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td class="p-2">${user}</td>
-      <td class="p-2">
-        ${info.permissao === "admin" 
-            ? '<span class="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs"><i class="fa-solid fa-crown"></i> Admin</span>' 
-            : info.permissao === "mista" 
-            ? '<span class="bg-purple-100 text-purple-800 px-2 py-1 rounded-full text-xs"><i class="fa-solid fa-gear"></i> Mista</span>' 
-            : '<span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs"><i class="fa-solid fa-box"></i> Solicitante</span>'}
-      </td>
-      <td class="p-2 space-x-2">
-        <button onclick="editarUsuario('${user}')" class="text-blue-600">Editar</button>
-        <button onclick="excluirUsuario('${user}')" class="text-red-600">Excluir</button>
-      </td>`;
-    tbody.appendChild(tr);
-  });
-}
-
-function cadastrarUsuario() {
-  const user = document.getElementById("novoUsuario").value.trim();
-  const senha = document.getElementById("senhaUsuario").value.trim();
-  const permissao = document.getElementById("permissaoUsuario").value;
-  if (!user || !senha) return alert("Preencha todos os campos.");
-  usuarios[user] = { senha, permissao };
-  salvarUsuarios();
-}
-
-function editarUsuario(user) {
-  const novaSenha = prompt("Nova senha para " + user + ":");
-  const novaPerm = prompt("Nova permissão (admin/solicitante):", usuarios[user].permissao);
-  if (novaSenha && novaPerm) {
-    usuarios[user].senha = novaSenha;
-    usuarios[user].permissao = novaPerm;
-    salvarUsuarios();
-  }
-}
-
-function excluirUsuario(user) {
-  if (confirm("Deseja excluir o usuário " + user + "?")) {
-    delete usuarios[user];
-    salvarUsuarios();
-  }
-}
-
-window.onload = function() {
-  document.body.classList.add("body-login");
-  populateMaterialDropdown();
-  document.getElementById("solicitante").value = currentUser;
-  const saved = localStorage.getItem("solicitacoes");
-  if (saved) document.getElementById("requestsTableBody").innerHTML = saved;
-  aplicarTempos();
-  listarUsuarios();
-};
-
-</script>
-
-
 <!-- Modal Adicionar Estoque -->
 <div id="estoqueScreen" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
   <div class="bg-white p-6 rounded-lg shadow-xl max-w-md w-full overflow-y-auto max-h-[90vh] relative">
@@ -817,6 +250,528 @@ window.onload = function() {
     </div>
   </div>
 </div>
+
+<script>
+    let currentUser = "";
+    const usuariosKey = "usuarios"; // Chave para armazenar usuários no localStorage
+
+    // Materiais iniciais (carregados do localStorage ou padrão)
+    let materiais = JSON.parse(localStorage.getItem("materiais")) || {
+        "C90322011-6": {quantidade: 2, descricao: "CURVA 90 GR RL AI ASTM A403 WP304L-W SCH 40S ANSI B16.9", location: "Almoxarifado, Prateleira 1", unit: "Pç", weight: "10.1 kg"},
+        "MLV004006-4x1": {quantidade: 1, descricao: "MEIA LUVA AI ASTM A182 F304L 3000# SW", location: "Almoxarifado, Prateleira 1", unit: "Pç", weight: "0.26 kg"},
+        "REC122017-3X11/4": {quantidade: 1, descricao: "RED CONC AI A403 CR304L SCH 5S MSS SP43", location: "Almoxarifado, Prateleira 1", unit: "Pç", weight: "0.34 kg"},
+        "TUB315019-14": {quantidade: 2205, descricao: "TUBO AI ASTM A358 TP304L CL2 C/C SCH 5S ANSI B36.19", location: "Almoxarifado, Prateleira 1", unit: "mm", weight: "60.15 kg"},
+        "TUB005009-2": {quantidade: 749, descricao: "TUBO AC ASTM A106 GR B S/C SCH 40", location: "Almoxarifado, Prateleira 1", unit: "mm", weight: "1.62 kg"},
+        "MLV001006-1": {quantidade: 1, descricao: "MEIA LUVA AC ASTM A105 3000# SW B16.11", location: "Almoxarifado, Prateleira 1", unit: "Pç", weight: "0.26 kg"},
+        "C45122014-12": {quantidade: 1, descricao: "CURVA 45 GR RL A403 CR304L SCH 5S MSS SP43", location: "Almoxarifado, Prateleira 1", unit: "Pç", weight: "9.65 kg"},
+        "TUB115008-11/2": {quantidade: 75069, descricao: "TUBO AI ASTM A312 TP304L C/C SCH 5S ANSI B36.19", location: "Almoxarifado, Prateleira 1", unit: "mm", weight: "2.5 kg"},
+        "C90195005-11/2": {quantidade: 18, descricao: "CURVA 90 GR RL AI ASTM A403 CR304L SCH5S MSS SP43", location: "Almoxarifado, Prateleira 1", unit: "Pç", weight: "0.62 kg"},
+        "FG8009017-10": {quantidade: 1, descricao: "FIGURA OITO AI ASTM A240 304L 300# CONF B33014-0052", location: "Almoxarifado, Prateleira 1", unit: "Pç", weight: "0.0 kg"},
+        "C90196008-3": {quantidade: 1, descricao: "CURVA 90 GR RL AI A403 CR304L 10S MSS SP43", location: "Almoxarifado, Prateleira 8", unit: "Pç", weight: "1.16 kg"},
+        "FST001011-6": {quantidade: 1, descricao: "FLANGE SOLTO AC ASTM A105 150# B16.5 ZINCADO A FOGO", location: "Almoxarifado, Prateleira 12", unit: "Pç", weight: "8.6 kg"},
+        "TUB298020-16": {quantidade: 974, descricao: "TUBO AI ASTM A358 TP304L CL2 C/C SCH STD ASME B36.19", location: "Almoxarifado, Prateleira 5", unit: "mm", weight: "258.32 kg"},
+        "FPE096012-8": {quantidade: 2, descricao: "FLANGE PESC AC ASTM A105 300# SCH 40 ANSI B16.5", location: "Almoxarifado, Prateleira 1", unit: "Pç", weight: "31.3 kg"},
+        "PES196009-4": {quantidade: 8, descricao: "PESTANA AI ASTM A403 GR WP304L-W SCH 40S MSS SP43", location: "Almoxarifado, Prateleira 1", unit: "Pç", weight: "1.81 kg"},
+        "FST002009-4": {quantidade: 8, descricao: "FLANGE SOLTO AC ASTM A105 300#", location: "Almoxarifado, Prateleira 1", unit: "Pç", weight: "10.9 kg"},
+        "TUB050009-2": {quantidade: 96016, descricao: "TUBO AI ASTM A312 TP304L C/C SCH 40S", location: "Almoxarifado, Prateleira 1", unit: "mm", weight: "1.51 kg"},
+        "TUB115013-4": {quantidade: 34695, descricao: "TUBO AI ASTM A312 TP304L C/C SCH 5S ANSI B36.19", location: "Almoxarifado, Prateleira 1", unit: "mm", weight: "504.0 kg"}
+    };
+
+    // --- Funções de Inicialização e Persistência ---
+
+    // Inicializa usuários padrão no localStorage se não existirem
+    function inicializarUsuarios() {
+        const usuariosFixos = {
+            "admin": { senha: "2025", permissao: "admin" },
+            "Sabino": { senha: "1234", permissao: "mista" },
+            "Ricardo": { senha: "1234", permissao: "solicitante" },
+            "Pablo": { senha: "1234", permissao: "solicitante" },
+            "Simone": { senha: "1234", permissao: "solicitante" },
+            "Vinicius": { senha: "1234", permissao: "solicitante" },
+            "Teste": { senha: "123", permissao: "mista" }
+        };
+        let usuariosAtuais = JSON.parse(localStorage.getItem(usuariosKey));
+        if (!usuariosAtuais) { 
+            localStorage.setItem(usuariosKey, JSON.stringify(usuariosFixos));
+        } else { 
+            let alterado = false;
+            for (let nome in usuariosFixos) {
+                if (!usuariosAtuais[nome]) {
+                    usuariosAtuais[nome] = usuariosFixos[nome];
+                    alterado = true;
+                }
+            }
+            if (alterado) {
+                localStorage.setItem(usuariosKey, JSON.stringify(usuariosAtuais));
+            }
+        }
+    }
+
+    // Carrega os usuários do localStorage (após inicialização)
+    let usuarios = JSON.parse(localStorage.getItem(usuariosKey));
+
+    // --- Funções de Autenticação ---
+    function login() {
+        const u = document.getElementById("user").value.trim();
+        const p = document.getElementById("pass").value.trim();
+        
+        // Recarrega usuários do localStorage para garantir que está atualizado
+        usuarios = JSON.parse(localStorage.getItem(usuariosKey));
+
+        if (usuarios[u] && usuarios[u].senha === p) {
+            document.body.classList.remove("body-login");
+            currentUser = u;
+            document.getElementById("loginScreen").style.display = "none";
+            document.getElementById("app").classList.remove("hidden");
+            document.getElementById("usuarioLogado").textContent = currentUser;
+            document.getElementById("loginError").classList.add("hidden");
+
+            // Mostrar filtro apenas para admin ou mista
+            if (usuarios[currentUser]?.permissao === "admin" || usuarios[currentUser]?.permissao === "mista") {
+                document.getElementById("statusFilterContainer").classList.remove("hidden");
+            } else {
+                document.getElementById("statusFilterContainer").classList.add("hidden");
+            }
+
+            // Exibir badge de permissão no topo
+            if (usuarios[currentUser]) {
+                const perm = usuarios[currentUser].permissao;
+                const badge = document.getElementById("badgePermissao");
+                badge.textContent = perm.charAt(0).toUpperCase() + perm.slice(1); // Capitaliza a primeira letra
+                badge.className = "ml-2 text-xs px-2 py-1 rounded-full"; // Reseta classes
+                if (perm === "admin") {
+                    badge.classList.add("bg-red-100", "text-red-800");
+                } else if (perm === "mista") {
+                    badge.classList.add("bg-purple-100", "text-purple-800");
+                } else {
+                    badge.classList.add("bg-blue-100", "text-blue-800");
+                }
+            }
+
+            document.getElementById("solicitante").value = currentUser;
+            populateMaterialDropdown(); // Popula o dropdown de materiais após o login
+            loadRequestsTable(); // Carrega as solicitações salvas e reatribui eventos
+            aplicarTempos(); // Aplica os tempos de prioridade salvos
+        } else {
+            document.getElementById("loginError").classList.remove("hidden");
+        }
+    }
+
+    function logout() {
+        location.reload(); // Recarrega a página para voltar à tela de login
+    }
+
+    // --- Funções de Manipulação de Materiais ---
+    function populateMaterialDropdown() {
+        const matSel = document.getElementById("material");
+        matSel.innerHTML = "";
+        for (let code in materiais) {
+            const m = materiais[code];
+            const opt = document.createElement("option");
+            opt.value = code;
+            opt.textContent = `${code} - ${m.descricao}`;
+            opt.dataset.stock = m.quantidade;
+            opt.dataset.location = m.location;
+            opt.dataset.unit = m.unit;
+            opt.dataset.weight = m.weight;
+            matSel.appendChild(opt);
+        }
+    }
+
+    // --- Funções de Formulário de Solicitação ---
+    document.getElementById("materialSearch").addEventListener("input", function () {
+        const termo = this.value.toLowerCase();
+        [...document.getElementById("material").options].forEach(opt => {
+            opt.style.display = opt.textContent.toLowerCase().includes(termo) ? "" : "none";
+        });
+    });
+
+    document.getElementById("material").addEventListener("change", function () {
+        const opt = this.selectedOptions[0];
+        if (opt) {
+            document.getElementById("estoqueInfo").textContent = `${opt.dataset.stock} ${opt.dataset.unit} (${opt.dataset.weight})`;
+            document.getElementById("localizacao").textContent = opt.dataset.location;
+        }
+        validateForm();
+    });
+
+    document.getElementById("quantidade").addEventListener("input", validateForm);
+
+    document.getElementById("increaseQty").onclick = () => {
+        const q = document.getElementById("quantidade");
+        q.value = parseInt(q.value) + 1;
+        validateForm();
+    };
+
+    document.getElementById("decreaseQty").onclick = () => {
+        const q = document.getElementById("quantidade");
+        if (parseInt(q.value) > 1) q.value = parseInt(q.value) - 1;
+        validateForm();
+    };
+
+    function validateForm() {
+        const m = document.getElementById("material").value;
+        const q = parseInt(document.getElementById("quantidade").value);
+        const s = parseInt(document.getElementById("material").selectedOptions[0]?.dataset.stock || 0);
+        document.getElementById("btnSolicitar").disabled = !(m && q > 0 && q <= s);
+    }
+
+    document.getElementById("solicitacaoForm").addEventListener("submit", function (e) {
+        e.preventDefault();
+        const solicitante = document.getElementById("solicitante").value;
+        const material = document.getElementById("material").value;
+        const quantidade = parseInt(document.getElementById("quantidade").value);
+        const prioridade = document.getElementById("prioridade").value;
+        const dataSolicitacao = new Date().toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" });
+        const id = Math.floor(Math.random() * 100000); // ID único para a linha
+
+        const tbody = document.getElementById("requestsTableBody");
+        const tr = document.createElement("tr");
+        tr.setAttribute('data-id', id); // Adiciona um data-id para identificar a linha
+        tr.setAttribute('data-status', 'Pendente'); // Adiciona um data-status para facilitar o filtro
+
+        tr.innerHTML = `
+            <td>${id}</td>
+            <td>${material}</td>
+            <td>${quantidade}</td>
+            <td>${prioridade}</td>
+            <td>Pendente</td>
+            <td>${solicitante}</td>
+            <td>${dataSolicitacao}</td>
+            <td></td>
+            <td>
+                <button onclick="concluir(this)">✔</button>
+                <button onclick="excluir(this)">✖</button>
+            </td>`;
+        tbody.appendChild(tr);
+        saveRequestsTable(); // Salva a tabela após adicionar
+        showFeedback("Solicitação enviada com sucesso!", "bg-green-100", "text-green-700");
+        this.reset();
+        document.getElementById("estoqueInfo").textContent = "--";
+        document.getElementById("localizacao").textContent = "--";
+        populateMaterialDropdown();
+        document.getElementById("solicitante").value = currentUser;
+        validateForm();
+    });
+
+    // --- Funções da Tabela de Solicitações ---
+    function concluir(btn) {
+        const row = btn.closest("tr");
+        const dataFinal = new Date().toLocaleString("pt-BR", { 
+            day: "2-digit", month: "2-digit", year: "numeric", 
+            hour: "2-digit", minute: "2-digit" 
+        });
+        
+        // Obter o código do material da linha
+        // O material está na célula 1, e o formato é "CODIGO - DESCRICAO"
+        const materialCellContent = row.cells[1].textContent;
+        const materialCode = materialCellContent.split(" - ")[0]; 
+
+        // Atualiza a quantidade do material no estoque
+        const quantidadeSolicitada = parseInt(row.cells[2].textContent);
+        if (materiais[materialCode]) {
+            materiais[materialCode].quantidade -= quantidadeSolicitada; // Desconta a quantidade solicitada
+            localStorage.setItem("materiais", JSON.stringify(materiais)); // Salva o estoque atualizado
+            populateMaterialDropdown(); // Atualiza o dropdown de materiais para refletir o novo estoque
+        }
+
+        row.cells[4].innerHTML = '<span class="text-green-700"><i class="fa-solid fa-check-circle"></i> Entregue</span>';
+        row.classList.add("priority-low"); // Usa a classe de cor verde para entregue
+        row.setAttribute('data-status', 'Entregue'); // Atualiza o data-status
+        row.cells[7].textContent = dataFinal; // Coluna Data Finalização
+
+        // Desabilita botões de ação
+        [...row.querySelectorAll("button")].forEach(b => {
+            b.disabled = true;
+            b.classList.add("opacity-50", "cursor-not-allowed");
+        });
+        
+        saveRequestsTable(); // Salva a tabela após concluir
+    }
+
+    function excluir(btn) {
+        // Verifica permissão antes de excluir
+        if (!(usuarios[currentUser]?.permissao === "admin" || usuarios[currentUser]?.permissao === "mista")) {
+            alert("Você não tem permissão para cancelar solicitações.");
+            return;
+        }
+
+        const row = btn.closest("tr");
+        const dataFinal = new Date().toLocaleString("pt-BR", { 
+            day: "2-digit", month: "2-digit", year: "numeric", 
+            hour: "2-digit", minute: "2-digit" 
+        });
+        row.cells[4].innerHTML = '<span class="text-red-700"><i class="fa-solid fa-times-circle"></i> Cancelado</span>';
+        row.classList.add("priority-high"); // Usa a classe de cor vermelha para cancelado
+        row.setAttribute('data-status', 'Cancelado'); // Atualiza o data-status
+        row.cells[7].textContent = dataFinal; // Coluna Data Finalização
+
+        // Desabilita botões de ação
+        [...row.querySelectorAll("button")].forEach(b => {
+            b.disabled = true;
+            b.classList.add("opacity-50", "cursor-not-allowed");
+        });
+        showFeedback("Solicitação cancelada.", "bg-red-100", "text-red-800");
+        saveRequestsTable(); // Salva a tabela após excluir
+    }
+
+    // Salva o conteúdo da tabela de solicitações no localStorage
+    function saveRequestsTable() {
+        localStorage.setItem("solicitacoes", document.getElementById("requestsTableBody").innerHTML);
+    }
+
+    // Carrega o conteúdo da tabela de solicitações do localStorage e reatribui eventos
+    function loadRequestsTable() {
+        const saved = localStorage.getItem("solicitacoes");
+        if (saved) {
+            document.getElementById("requestsTableBody").innerHTML = saved;
+            // Re-atribui os event listeners para os botões após carregar do localStorage
+            document.querySelectorAll("#requestsTableBody button").forEach(button => {
+                // Verifica se o botão não está desabilitado (para não reatribuir a botões já finalizados)
+                if (!button.disabled) { 
+                    if (button.textContent.includes("✔")) {
+                        button.onclick = function() { concluir(this); };
+                    } else if (button.textContent.includes("✖")) {
+                        button.onclick = function() { excluir(this); };
+                    }
+                }
+            });
+
+            // REAPLICA AS CLASSES DE COR APÓS CARREGAR O HTML
+            document.querySelectorAll("#requestsTableBody tr").forEach(row => {
+                const status = row.getAttribute('data-status');
+                // Remove classes antigas para evitar duplicação ou conflito
+                row.classList.remove('priority-low', 'priority-high', 'priority-medium'); 
+                if (status === 'Entregue') {
+                    row.classList.add('priority-low');
+                } else if (status === 'Cancelado') {
+                    row.classList.add('priority-high');
+                }
+                // Se houver outras prioridades/status que afetam a cor da linha, adicione aqui
+                // Ex: if (status === 'Pendente' && row.cells[3].textContent === 'Média') { row.classList.add('priority-medium'); }
+            });
+        }
+        // Aplica o filtro atual após carregar a tabela
+        applyStatusFilter();
+    }
+
+    // Aplica o filtro de status na tabela
+    function applyStatusFilter() {
+        const selectedStatus = document.getElementById("statusFilter").value;
+        const rows = document.querySelectorAll("#requestsTableBody tr");
+        rows.forEach(row => {
+            const rowStatus = row.getAttribute('data-status'); // Pega o status do atributo data-status
+            if (selectedStatus === "Todos" || rowStatus === selectedStatus) {
+                row.style.display = "";
+            } else {
+                row.style.display = "none";
+            }
+        });
+    }
+
+    // Filtro de solicitações por status
+    document.getElementById("statusFilter").addEventListener("change", function() {
+        applyStatusFilter(); // Aplica o filtro quando o valor do select muda
+    });
+
+    // --- Funções de Feedback ---
+    function showFeedback(msg, bg, text) {
+        const fb = document.getElementById("feedback");
+        fb.textContent = msg;
+        fb.className = `block p-3 rounded ${bg} ${text}`;
+        setTimeout(() => {
+            fb.classList.add("hidden");
+        }, 3000); // Oculta a mensagem após 3 segundos
+    }
+
+    // --- Funções do Modal Adicionar Estoque ---
+    function abrirAdicionarEstoque() {
+        if (usuarios[currentUser]?.permissao === "admin" || usuarios[currentUser]?.permissao === "mista") {
+            document.getElementById("estoqueScreen").classList.remove("hidden");
+        } else {
+            alert("Você não tem permissão para adicionar estoque.");
+        }
+    }
+    function fecharAdicionarEstoque() {
+        document.getElementById("estoqueScreen").classList.add("hidden");
+    }
+    function salvarNovoEstoque() {
+        const codigo = document.getElementById("novoCodigo").value.trim();
+        const descricao = document.getElementById("novaDescricao").value.trim();
+        const quantidade = parseInt(document.getElementById("novaQuantidade").value.trim());
+        const unidade = document.getElementById("novaUnidade").value.trim();
+        const localizacao = document.getElementById("novaLocalizacao").value.trim();
+        const peso = document.getElementById("novoPeso").value.trim();
+
+        if (!codigo || !descricao || !quantidade || !unidade || !localizacao || !peso) {
+            alert("Preencha todos os campos.");
+            return;
+        }
+        if (materiais[codigo]) {
+            alert("Já existe um material com esse código.");
+            return;
+        }
+
+        materiais[codigo] = {
+            quantidade: quantidade,
+            descricao: descricao,
+            unit: unidade,
+            location: localizacao,
+            weight: peso
+        };
+
+        localStorage.setItem("materiais", JSON.stringify(materiais));
+        populateMaterialDropdown();
+        fecharAdicionarEstoque();
+        showFeedback("Material adicionado com sucesso!", "bg-green-100", "text-green-700");
+
+        // Limpa os campos do formulário
+        document.getElementById("novoCodigo").value = "";
+        document.getElementById("novaDescricao").value = "";
+        document.getElementById("novaQuantidade").value = "";
+        document.getElementById("novaUnidade").value = "";
+        document.getElementById("novaLocalizacao").value = "";
+        document.getElementById("novoPeso").value = "";
+    }
+
+    // --- Funções do Modal de Configurações ---
+    function abrirConfiguracoes() {
+        if (usuarios[currentUser]?.permissao !== "admin") {
+            alert("Apenas o usuário admin pode editar as configurações.");
+            return;
+        }
+        document.getElementById("configScreen").classList.remove("hidden");
+        // Carrega os valores salvos ou padrão
+        document.getElementById("tempoAlta").value = localStorage.getItem("tempoAlta") || "Entrega imediata";
+        document.getElementById("tempoMedia").value = localStorage.getItem("tempoMedia") || "Entrega em 2 horas";
+        document.getElementById("tempoBaixa").value = localStorage.getItem("tempoBaixa") || "Entrega em 4 horas";
+        listarUsuarios(); // Lista os usuários ao abrir as configurações
+    }
+    function fecharConfig() {
+        document.getElementById("configScreen").classList.add("hidden");
+    }
+    function salvarConfiguracoes() {
+        localStorage.setItem("tempoAlta", document.getElementById("tempoAlta").value);
+        localStorage.setItem("tempoMedia", document.getElementById("tempoMedia").value);
+        localStorage.setItem("tempoBaixa", document.getElementById("tempoBaixa").value);
+        aplicarTempos();
+        fecharConfig();
+        showFeedback("Configurações salvas com sucesso!", "bg-green-100", "text-green-700");
+    }
+
+    function aplicarTempos() {
+        const tempoAlta = localStorage.getItem("tempoAlta") || "Entrega imediata";
+        const tempoMedia = localStorage.getItem("tempoMedia") || "Entrega em 2 horas";
+        const tempoBaixa = localStorage.getItem("tempoBaixa") || "Entrega em 4 horas";
+
+        const prioridade = document.getElementById("prioridade");
+        if (prioridade && prioridade.options.length >= 3) {
+            prioridade.options[0].text = `Baixa (${tempoBaixa})`;
+            prioridade.options[1].text = `Média (${tempoMedia})`;
+            prioridade.options[2].text = `Alta (${tempoAlta})`;
+        }
+    }
+
+    // --- Gerenciamento de Usuários (dentro do modal de Configurações) ---
+    function salvarUsuarios() {
+        localStorage.setItem(usuariosKey, JSON.stringify(usuarios));
+        listarUsuarios(); // Atualiza a lista na tela
+    }
+
+    function listarUsuarios() {
+        const tbody = document.getElementById("tabelaUsuarios");
+        if (!tbody) return;
+        tbody.innerHTML = "";
+        // Recarrega usuários do localStorage para garantir que está atualizado
+        usuarios = JSON.parse(localStorage.getItem(usuariosKey)); 
+        Object.entries(usuarios).forEach(([user, info]) => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td class="p-2">${user}</td>
+                <td class="p-2">
+                    ${info.permissao === "admin" 
+                        ? '<span class="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs"><i class="fa-solid fa-crown"></i> Admin</span>' 
+                        : info.permissao === "mista" 
+                        ? '<span class="bg-purple-100 text-purple-800 px-2 py-1 rounded-full text-xs"><i class="fa-solid fa-gear"></i> Mista</span>' 
+                        : '<span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs"><i class="fa-solid fa-box"></i> Solicitante</span>'}
+                </td>
+                <td class="p-2 space-x-2">
+                    <button onclick="editarUsuario('${user}')" class="text-blue-600 hover:underline">Editar</button>
+                    <button onclick="excluirUsuario('${user}')" class="text-red-600 hover:underline">Excluir</button>
+                </td>`;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function cadastrarUsuario() {
+        const user = document.getElementById("novoUsuario").value.trim();
+        const senha = document.getElementById("senhaUsuario").value.trim();
+        const permissao = document.getElementById("permissaoUsuario").value;
+        if (!user || !senha) {
+            alert("Preencha todos os campos para cadastrar o usuário.");
+            return;
+        }
+        if (usuarios[user]) {
+            alert("Já existe um usuário com esse nome.");
+            return;
+        }
+        usuarios[user] = { senha, permissao };
+        salvarUsuarios();
+        document.getElementById("novoUsuario").value = "";
+        document.getElementById("senhaUsuario").value = "";
+        showFeedback("Usuário cadastrado com sucesso!", "bg-green-100", "text-green-700");
+    }
+
+    function editarUsuario(user) {
+        const novaSenha = prompt("Nova senha para " + user + ":");
+        if (novaSenha === null) return; // Usuário cancelou
+        
+        let novaPerm = prompt("Nova permissão para " + user + " (admin, mista ou solicitante):", usuarios[user].permissao);
+        if (novaPerm === null) return; // Usuário cancelou
+
+        novaPerm = novaPerm.toLowerCase();
+        if (!["admin", "mista", "solicitante"].includes(novaPerm)) {
+            alert("Permissão inválida. Use 'admin', 'mista' ou 'solicitante'.");
+            return;
+        }
+
+        usuarios[user].senha = novaSenha;
+        usuarios[user].permissao = novaPerm;
+        salvarUsuarios();
+        showFeedback("Usuário editado com sucesso!", "bg-green-100", "text-green-700");
+    }
+
+    function excluirUsuario(user) {
+        if (user === "admin") { // Impede a exclusão do usuário admin padrão
+            alert("O usuário 'admin' não pode ser excluído.");
+            return;
+        }
+        if (confirm("Deseja realmente excluir o usuário " + user + "?")) {
+            delete usuarios[user];
+            salvarUsuarios();
+            showFeedback("Usuário excluído com sucesso!", "bg-green-100", "text-green-700");
+        }
+    }
+
+    // --- Event Listeners Iniciais ---
+    document.getElementById("btnLogin").addEventListener("click", login);
+
+    // --- Inicialização ao carregar a página ---
+    window.onload = function() {
+        inicializarUsuarios(); // Garante que os usuários padrão existam
+        
+        document.body.classList.add("body-login"); // Mantém a tela de login
+        
+        // Se já estiver logado (ex: após um refresh), renderiza o app
+        // Esta parte é mais complexa com o padrão original, pois currentUser não é persistente
+        // Uma solução seria salvar currentUser no localStorage também, mas para manter o foco
+        // no padrão original da tabela, vamos assumir que o usuário sempre fará login.
+
+        populateMaterialDropdown(); // Popula o dropdown de materiais
+        loadRequestsTable(); // Carrega as solicitações salvas e reatribui eventos
+        aplicarTempos(); // Aplica os tempos de prioridade salvos
+    };
+</script>
 
 </body>
 </html>
