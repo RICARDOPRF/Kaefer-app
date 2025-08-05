@@ -1,10 +1,11 @@
 <!DOCTYPE html>
+
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Solicitação de Materiais - KAEFER Teckma Engenharia</title>
-    <script src="https://cdn.tailwindcss.com">
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Solicitação de Materiais - KAEFER Teckma Engenharia</title>
+<script src="https://cdn.tailwindcss.com">
 let currentUser = "";
 
 function login() {
@@ -73,62 +74,13 @@ function logout() {
   location.reload();
 }
 
-
-function abrirAdicionarEstoque() {
-  if (usuarios[currentUser]?.permissao === "admin" || usuarios[currentUser]?.permissao === "mista") {
-    document.getElementById("estoqueScreen").classList.remove("hidden");
-  } else {
-    alert("Você não tem permissão para adicionar estoque.");
-  }
-}
-function fecharAdicionarEstoque() {
-  document.getElementById("estoqueScreen").classList.add("hidden");
-}
-function salvarNovoEstoque() {
-  const codigo = document.getElementById("novoCodigo").value.trim();
-  const descricao = document.getElementById("novaDescricao").value.trim();
-  const quantidade = parseInt(document.getElementById("novaQuantidade").value.trim());
-  const unidade = document.getElementById("novaUnidade").value.trim();
-  const localizacao = document.getElementById("novaLocalizacao").value.trim();
-  const peso = document.getElementById("novoPeso").value.trim();
-
-  if (!codigo || !descricao || !quantidade || !unidade || !localizacao || !peso) {
-    alert("Preencha todos os campos.");
-    return;
-  }
-  if (materiais[codigo]) {
-    alert("Já existe um material com esse código.");
-    return;
-  }
-
-  materiais[codigo] = {
-    quantidade: quantidade,
-    descricao: descricao,
-    unit: unidade,
-    location: localizacao,
-    weight: peso
-  };
-
-  localStorage.setItem("materiais", JSON.stringify(materiais));
-  populateMaterialDropdown();
-  fecharAdicionarEstoque();
-  showFeedback("Material adicionado com sucesso!", "bg-green-100", "text-green-700");
-
-  document.getElementById("novoCodigo").value = "";
-  document.getElementById("novaDescricao").value = "";
-  document.getElementById("novaQuantidade").value = "";
-  document.getElementById("novaUnidade").value = "";
-  document.getElementById("novaLocalizacao").value = "";
-  document.getElementById("novoPeso").value = "";
-}
-
 function abrirConfiguracoes() {
   window.open("configuracoes.html", "_blank");
 }
 
 </script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+<style>
         :root {
             --kaefer-blue: #0072B8;
             --kaefer-blue-dark: #005a91;
@@ -161,150 +113,118 @@ function abrirConfiguracoes() {
 </style>
 </head>
 <body class="bg-gray-50">
-
 <div class="hidden"></div>
-
-    
-
-
 <!-- Login Screen com imagem de fundo -->
-<div id="loginScreen" class="relative bg-cover bg-center flex items-center justify-center" style="background-image: url('https://i.postimg.cc/tC067ZNG/TKLOGIN-Obra.png'); height: 100vh; overflow: hidden;">
-  <div class="bg-white/80 shadow-lg rounded-lg p-8 w-full max-w-sm text-center backdrop-blur-sm">
-    <img class="opacity-80 drop-shadow-sm" src="https://placehold.co/300x100/0072B8/FFFFFF?text=KAEFER+Teckma" alt="Logo" class="mx-auto mb-6 h-20">
-    <h1 class="text-xl font-bold text-gray-800 mb-4">Acesso ao Sistema</h1>
-    <input id="user" type="text" placeholder="Usuário" class="border border-gray-300 p-2 mb-3 w-full rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
-    <input id="pass" type="password" placeholder="Senha" class="border border-gray-300 p-2 mb-4 w-full rounded focus:outline-none focus:ring-2 focus:ring-blue-500" />
-    <button onclick="login()" class="bg-[#0072B8] hover:bg-[#005a91] text-white px-4 py-2 rounded w-full font-semibold">Entrar</button>
-    <p id="loginError" class="text-red-600 mt-3 hidden text-sm">Usuário ou senha inválidos</p>
-  </div>
+<div class="relative bg-cover bg-center flex items-center justify-center" id="loginScreen" style="background-image: url('https://i.postimg.cc/tC067ZNG/TKLOGIN-Obra.png'); height: 100vh; overflow: hidden;">
+<div class="bg-white/80 shadow-lg rounded-lg p-8 w-full max-w-sm text-center backdrop-blur-sm">
+<img alt="Logo" class="mx-auto mb-6 h-20" src="https://placehold.co/300x100/0072B8/FFFFFF?text=KAEFER+Teckma"/>
+<h1 class="text-xl font-bold text-gray-800 mb-4">Acesso ao Sistema</h1>
+<input class="border border-gray-300 p-2 mb-3 w-full rounded focus:outline-none focus:ring-2 focus:ring-blue-500" id="user" placeholder="Usuário" type="text"/>
+<input class="border border-gray-300 p-2 mb-4 w-full rounded focus:outline-none focus:ring-2 focus:ring-blue-500" id="pass" placeholder="Senha" type="password"/>
+<button class="bg-[#0072B8] hover:bg-[#005a91] text-white px-4 py-2 rounded w-full font-semibold" onclick="login()">Entrar</button>
+<p class="text-red-600 mt-3 hidden text-sm" id="loginError">Usuário ou senha inválidos</p>
 </div>
-
-<div id="app" class="hidden container mx-auto px-4 py-8 max-w-6xl">
-        
+</div>
+<div class="hidden container mx-auto px-4 py-8 max-w-6xl" id="app">
 <!-- Top bar com usuário logado -->
 <div class="w-full flex flex-col items-end gap-2 mb-4 pr-1">
-  <div class="flex items-center gap-4">
-  <div class="text-sm text-gray-700">
-    <i class="fa-solid fa-user text-gray-500"></i> <span class="text-sm">Usuário:</span> <span id="usuarioLogado" class="font-semibold text-blue-600"></span>
-       <span id="badgePermissao" class="ml-2 text-xs px-2 py-1 rounded-full"></span>
-  </div>
-  <button onclick="logout()" class="bg-red-600 text-white px-3 py-1 rounded text-sm">Sair</button>
-  </div>
-  <button onclick="abrirConfiguracoes()" class="bg-gray-300 text-gray-800 px-3 py-1 rounded text-sm hover:bg-gray-400">⚙️ Configurações</button>
+<div class="flex items-center gap-4">
+<div class="text-sm text-gray-700">
+<i class="fa-solid fa-user text-gray-500"></i> <span class="text-sm">Usuário:</span> <span class="font-semibold text-blue-600" id="usuarioLogado"></span>
+<span class="ml-2 text-xs px-2 py-1 rounded-full" id="badgePermissao"></span>
+</div>
+<button class="bg-red-600 text-white px-3 py-1 rounded text-sm" onclick="logout()">Sair</button>
+</div>
+<button class="bg-gray-300 text-gray-800 px-3 py-1 rounded text-sm hover:bg-gray-400" onclick="abrirConfiguracoes()">⚙️ Configurações</button>
 </div>
 </div>
-
 <div class="flex flex-col items-center justify-center text-center mb-8">
-            <div>
-                <h1 class="text-3xl font-bold text-gray-800">SOLICITAÇÃO DE MATERIAIS</h1>
-                <p class="text-gray-600">Sistema de gestão de requisições</p>
-            </div>
-        </div>
-
-    <h1 class="text-2xl font-bold mb-4">Solicitação de Materiais</h1>
-
-    <form id="solicitacaoForm" class="bg-white p-4 rounded shadow space-y-4">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div>
-          <label for="solicitante" class="block text-sm font-medium text-gray-700 mb-1">Solicitante *</label>
-<input id="solicitante" readonly class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 text-gray-800 shadow-sm" />
+<div>
+<h1 class="text-3xl font-bold text-gray-800">SOLICITAÇÃO DE MATERIAIS</h1>
+<p class="text-gray-600">Sistema de gestão de requisições</p>
 </div>
-        <div>
-          <label for="prioridade" class="block font-semibold mb-1">Prioridade</label>
-          <select id="prioridade" required class="w-full border p-2 rounded">
-  <option value="Baixa">Baixa (Entrega em 4 horas)</option>
-  <option value="Média">Média (Entrega em 2 horas)</option>
-  <option value="Alta">Alta (Entrega imediata)</option>
+</div>
+<h1 class="text-2xl font-bold mb-4">Solicitação de Materiais</h1>
+<form class="bg-white p-4 rounded shadow space-y-4" id="solicitacaoForm">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div>
+<label class="block text-sm font-medium text-gray-700 mb-1" for="solicitante">Solicitante *</label>
+<input class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 text-gray-800 shadow-sm" id="solicitante" readonly=""/>
+</div>
+<div>
+<label class="block font-semibold mb-1" for="prioridade">Prioridade</label>
+<select class="w-full border p-2 rounded" id="prioridade" required="">
+<option value="Baixa">Baixa (Entrega em 4 horas)</option>
+<option value="Média">Média (Entrega em 2 horas)</option>
+<option value="Alta">Alta (Entrega imediata)</option>
 </select>
-        </div>
-      </div>
-
-      <div>
-        <label for="materialSearch" class="block font-semibold mb-1">Buscar Material</label>
-        <input type="text" id="materialSearch" placeholder="Digite código ou descrição..."
-          class="w-full border p-2 rounded mb-2" />
-      </div>
-
-      <div>
-        <label for="material" class="block font-semibold mb-1">Material *</label>
-        <select id="material" required size="8"
-          class="w-full border p-2 rounded bg-white"></select>
-      </div>
-
-      
+</div>
+</div>
+<div>
+<label class="block font-semibold mb-1" for="materialSearch">Buscar Material</label>
+<input class="w-full border p-2 rounded mb-2" id="materialSearch" placeholder="Digite código ou descrição..." type="text"/>
+</div>
+<div>
+<label class="block font-semibold mb-1" for="material">Material *</label>
+<select class="w-full border p-2 rounded bg-white" id="material" required="" size="8"></select>
+</div>
 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-  <div>
-    <label class="block font-semibold mb-1">Estoque disponível</label>
-    <div id="estoqueInfo" class="bg-gray-100 p-2 rounded text-center w-full min-h-[42px]">--</div>
-<div class="mt-2">
-  <button type="button" onclick="abrirAdicionarEstoque()" class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm">
-    <i class="fa-solid fa-plus"></i> Adicionar Estoque
-  </button>
+<div>
+<label class="block font-semibold mb-1">Estoque disponível</label>
+<div class="bg-gray-100 p-2 rounded text-center w-full min-h-[42px]" id="estoqueInfo">--</div>
 </div>
-
-  </div>
-  <div>
-    <label class="block font-semibold mb-1">Quantidade</label>
-    <div class="flex w-full min-h-[42px]">
-      <button type="button" id="decreaseQty" class="px-3 bg-gray-200 rounded-l">-</button>
-      <input type="number" id="quantidade" min="1" value="1" class="text-center w-full border-y border-gray-300" />
-      <button type="button" id="increaseQty" class="px-3 bg-gray-200 rounded-r">+</button>
-    </div>
-  </div>
-  <div>
-    <label class="block font-semibold mb-1">Localização</label>
-    <div id="localizacao" class="bg-gray-100 p-2 rounded text-center w-full min-h-[42px]">--</div>
-  </div>
+<div>
+<label class="block font-semibold mb-1">Quantidade</label>
+<div class="flex w-full min-h-[42px]">
+<button class="px-3 bg-gray-200 rounded-l" id="decreaseQty" type="button">-</button>
+<input class="text-center w-full border-y border-gray-300" id="quantidade" min="1" type="number" value="1"/>
+<button class="px-3 bg-gray-200 rounded-r" id="increaseQty" type="button">+</button>
 </div>
-
-
-      <div class="flex justify-end gap-2 pt-2">
-        <button type="reset" class="border px-4 py-2 rounded">Limpar</button>
-        <button type="submit" id="btnSolicitar" class="bg-blue-600 text-white px-4 py-2 rounded disabled:opacity-50" disabled>Enviar</button>
-      </div>
-    </form>
-
-    <div id="feedback" class="hidden p-3 rounded bg-gray-100 text-gray-800"></div>
-
-    
+</div>
+<div>
+<label class="block font-semibold mb-1">Localização</label>
+<div class="bg-gray-100 p-2 rounded text-center w-full min-h-[42px]" id="localizacao">--</div>
+</div>
+</div>
+<div class="flex justify-end gap-2 pt-2">
+<button class="border px-4 py-2 rounded" type="reset">Limpar</button>
+<button class="bg-blue-600 text-white px-4 py-2 rounded disabled:opacity-50" disabled="" id="btnSolicitar" type="submit">Enviar</button>
+</div>
+</form>
+<div class="hidden p-3 rounded bg-gray-100 text-gray-800" id="feedback"></div>
 <div class="bg-white p-6 rounded-xl shadow border border-gray-200">
-  <h2 class="text-2xl font-bold text-[#0072B8] flex items-center gap-2 mb-4">
-    <i class="fa-solid fa-box-open"></i> Solicitações de Materiais
+<h2 class="text-2xl font-bold text-[#0072B8] flex items-center gap-2 mb-4">
+<i class="fa-solid fa-box-open"></i> Solicitações de Materiais
   </h2>
-  
-<div id="statusFilterContainer" class="mb-4 hidden">
-  <label for="statusFilter" class="font-semibold mr-2">Filtrar por status:</label>
-  <select id="statusFilter" class="border p-1 rounded">
-    <option value="Todos">Todos</option>
-    <option value="Pendente">Pendentes</option>
-    <option value="Entregue">Entregues</option>
-    <option value="Cancelado">Canceladas</option>
-  </select>
+<div class="mb-4 hidden" id="statusFilterContainer">
+<label class="font-semibold mr-2" for="statusFilter">Filtrar por status:</label>
+<select class="border p-1 rounded" id="statusFilter">
+<option value="Todos">Todos</option>
+<option value="Pendente">Pendentes</option>
+<option value="Entregue">Entregues</option>
+<option value="Cancelado">Canceladas</option>
+</select>
 </div>
-
-  <div class="overflow-x-auto">
-    <table class="w-full text-sm text-left border border-gray-200 rounded overflow-hidden">
-      <thead class="bg-[#E3F2FD] text-[#003d66] text-sm font-semibold">
-        <tr>
-          <th class="py-2 px-3 border-b border-gray-300">ID</th>
-          <th class="py-2 px-3 border-b border-gray-300">Material</th>
-          <th class="py-2 px-3 border-b border-gray-300">Qtd</th>
-          <th class="py-2 px-3 border-b border-gray-300">Prioridade</th>
-          <th class="py-2 px-3 border-b border-gray-300">Status</th>
-          <th class="py-2 px-3 border-b border-gray-300">Solicitante</th>
-          <th class="py-2 px-3 border-b border-gray-300">Data</th>
-          <th class="py-2 px-3 border-b border-gray-300">Ações</th>
-        </tr>
-      </thead>
-      <tbody id="requestsTableBody" class="divide-y divide-gray-100 bg-white"></tbody>
-    </table>
-  </div>
+<div class="overflow-x-auto">
+<table class="w-full text-sm text-left border border-gray-200 rounded overflow-hidden">
+<thead class="bg-[#E3F2FD] text-[#003d66] text-sm font-semibold">
+<tr>
+<th class="py-2 px-3 border-b border-gray-300">ID</th>
+<th class="py-2 px-3 border-b border-gray-300">Material</th>
+<th class="py-2 px-3 border-b border-gray-300">Qtd</th>
+<th class="py-2 px-3 border-b border-gray-300">Prioridade</th>
+<th class="py-2 px-3 border-b border-gray-300">Status</th>
+<th class="py-2 px-3 border-b border-gray-300">Solicitante</th>
+<th class="py-2 px-3 border-b border-gray-300">Data</th>
+<th class="py-2 px-3 border-b border-gray-300">Ações</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-gray-100 bg-white" id="requestsTableBody"></tbody>
+</table>
 </div>
-
-  </div>
-
+</div>
 <script>
-let materiais = JSON.parse(localStorage.getItem("materiais")) || {
+const materiais = {
 "C90322011-6": {quantidade: 2, descricao: "CURVA 90 GR RL AI ASTM A403 WP304L-W SCH 40S ANSI B16.9", location: "Almoxarifado, Prateleira 1", unit: "Pç", weight: "10.1 kg"},
 "MLV004006-4x1": {quantidade: 1, descricao: "MEIA LUVA AI ASTM A182 F304L 3000# SW", location: "Almoxarifado, Prateleira 1", unit: "Pç", weight: "0.26 kg"},
 "REC122017-3X11/4": {quantidade: 1, descricao: "RED CONC AI A403 CR304L SCH 5S MSS SP43", location: "Almoxarifado, Prateleira 1", unit: "Pç", weight: "0.34 kg"},
@@ -387,9 +307,17 @@ document.getElementById("solicitacaoForm").addEventListener("submit", function (
   const tbody = document.getElementById("requestsTableBody");
   const tr = document.createElement("tr");
   const id = Math.floor(Math.random() * 10000);
+    let acoes = '';
+  if (usuarios[currentUser]?.permissao === "admin" || usuarios[currentUser]?.permissao === "mista") {
+    acoes = `<button onclick="concluir(this)" class="px-2 py-1 rounded">✔</button>
+             <button onclick="excluir(this)" class="px-2 py-1 rounded">✖</button>`;
+  }
+
   tr.innerHTML = `<td>${id}</td><td>${m}</td><td>${q}</td><td>${p}</td>
   <td>Pendente</td><td>${s}</td><td>${new Date().toLocaleString()}</td>
-  <td><button onclick="concluir(this)">✔</button> <button onclick="excluir(this)">✖</button></td>`;
+  <td>${acoes}</td>`;  tr.innerHTML = `<td>${id}</td><td>${m}</td><td>${q}</td><td>${p}</td>
+  <td>Pendente</td><td>${s}</td><td>${new Date().toLocaleString()}</td>
+  <td>${acoes}</td>`;
   tbody.appendChild(tr);
   localStorage.setItem("solicitacoes", tbody.innerHTML);
   showFeedback("Solicitação enviada com sucesso!", "bg-green-100", "text-green-700");
@@ -515,61 +443,11 @@ function logout() {
   location.reload();
 }
 
-
-function abrirAdicionarEstoque() {
-  if (usuarios[currentUser]?.permissao === "admin" || usuarios[currentUser]?.permissao === "mista") {
-    document.getElementById("estoqueScreen").classList.remove("hidden");
-  } else {
-    alert("Você não tem permissão para adicionar estoque.");
-  }
-}
-function fecharAdicionarEstoque() {
-  document.getElementById("estoqueScreen").classList.add("hidden");
-}
-function salvarNovoEstoque() {
-  const codigo = document.getElementById("novoCodigo").value.trim();
-  const descricao = document.getElementById("novaDescricao").value.trim();
-  const quantidade = parseInt(document.getElementById("novaQuantidade").value.trim());
-  const unidade = document.getElementById("novaUnidade").value.trim();
-  const localizacao = document.getElementById("novaLocalizacao").value.trim();
-  const peso = document.getElementById("novoPeso").value.trim();
-
-  if (!codigo || !descricao || !quantidade || !unidade || !localizacao || !peso) {
-    alert("Preencha todos os campos.");
-    return;
-  }
-  if (materiais[codigo]) {
-    alert("Já existe um material com esse código.");
-    return;
-  }
-
-  materiais[codigo] = {
-    quantidade: quantidade,
-    descricao: descricao,
-    unit: unidade,
-    location: localizacao,
-    weight: peso
-  };
-
-  localStorage.setItem("materiais", JSON.stringify(materiais));
-  populateMaterialDropdown();
-  fecharAdicionarEstoque();
-  showFeedback("Material adicionado com sucesso!", "bg-green-100", "text-green-700");
-
-  document.getElementById("novoCodigo").value = "";
-  document.getElementById("novaDescricao").value = "";
-  document.getElementById("novaQuantidade").value = "";
-  document.getElementById("novaUnidade").value = "";
-  document.getElementById("novaLocalizacao").value = "";
-  document.getElementById("novoPeso").value = "";
-}
-
 function abrirConfiguracoes() {
   window.open("configuracoes.html", "_blank");
 }
 
 </script>
-
 <script>
 function aplicarTempos() {
   const tempoAlta = localStorage.getItem("tempoAlta") || "Entrega imediata";
@@ -593,112 +471,55 @@ window.onload = function() {
   aplicarTempos();
 };
 </script>
-
-
 <!-- Modal de Configuração Interna -->
-<div id="configScreen" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-  <div class="bg-white p-6 rounded-lg shadow-xl max-w-md w-full overflow-y-auto max-h-[90vh] relative">
-<button onclick="fecharConfig()"
-  class="absolute top-3 right-3 text-gray-500 hover:text-red-600 text-xl font-bold">
-  &times;
+<div class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center" id="configScreen">
+<div class="bg-white p-6 rounded-lg shadow-xl max-w-md w-full overflow-y-auto max-h-[90vh] relative">
+<button class="absolute top-3 right-3 text-gray-500 hover:text-red-600 text-xl font-bold" onclick="fecharConfig()">
+  ×
 </button>
-
-    <h2 class="text-xl font-bold text-gray-800 mb-4">Configurações de Prioridades</h2>
-    <form class="space-y-4">
-      <div>
-        <label class="block font-medium">Tempo Alta</label>
-        <input id="tempoAlta" type="text" class="w-full border p-2 rounded" />
-      </div>
-      <div>
-        <label class="block font-medium">Tempo Média</label>
-        <input id="tempoMedia" type="text" class="w-full border p-2 rounded" />
-      </div>
-      <div>
-        <label class="block font-medium">Tempo Baixa</label>
-        <input id="tempoBaixa" type="text" class="w-full border p-2 rounded" />
-      </div>
-      <div class="flex justify-end gap-2">
-        <button type="button" onclick="salvarConfiguracoes()" class="bg-blue-600 text-white px-4 py-2 rounded">Salvar</button>
-        <button type="button" onclick="fecharConfig()" class="border px-4 py-2 rounded">Fechar</button>
-      </div>
-    </form>
-  
-<hr class="my-6 border-t border-gray-300">
-
+<h2 class="text-xl font-bold text-gray-800 mb-4">Configurações de Prioridades</h2>
+<form class="space-y-4">
+<div>
+<label class="block font-medium">Tempo Alta</label>
+<input class="w-full border p-2 rounded" id="tempoAlta" type="text"/>
+</div>
+<div>
+<label class="block font-medium">Tempo Média</label>
+<input class="w-full border p-2 rounded" id="tempoMedia" type="text"/>
+</div>
+<div>
+<label class="block font-medium">Tempo Baixa</label>
+<input class="w-full border p-2 rounded" id="tempoBaixa" type="text"/>
+</div>
+<div class="flex justify-end gap-2">
+<button class="bg-blue-600 text-white px-4 py-2 rounded" onclick="salvarConfiguracoes()" type="button">Salvar</button>
+<button class="border px-4 py-2 rounded" onclick="fecharConfig()" type="button">Fechar</button>
+</div>
+</form>
+<hr class="my-6 border-t border-gray-300"/>
 <!-- Gerenciar Usuários (Admin) -->
 <div class="mt-6">
-  <h2 class="text-lg font-bold text-gray-800 mb-2">Gerenciar Usuários</h2>
-  <div class="space-y-2 mb-4">
-    <input id="novoUsuario" type="text" placeholder="Novo Usuário" class="w-full p-2 border rounded" />
-    <input id="senhaUsuario" type="password" placeholder="Senha" class="w-full p-2 border rounded" />
-    <select id="permissaoUsuario" class="w-full p-2 border rounded">
-      <option value="solicitante">Solicitante</option>
-      <option value="admin">Admin</option>
-      <option value="mista">Mista</option>
-    </select>
-    <button onclick="cadastrarUsuario()" class="bg-green-600 text-white px-4 py-2 rounded">Cadastrar</button>
-  </div>
-  <table class="w-full mt-2 border">
-    <thead class="bg-gray-100">
-      <tr><th class="p-2">Usuário</th><th class="p-2">Permissão</th><th class="p-2">Ações</th></tr>
-    </thead>
-    <tbody id="tabelaUsuarios" class="text-sm"></tbody>
-  </table>
+<h2 class="text-lg font-bold text-gray-800 mb-2">Gerenciar Usuários</h2>
+<div class="space-y-2 mb-4">
+<input class="w-full p-2 border rounded" id="novoUsuario" placeholder="Novo Usuário" type="text"/>
+<input class="w-full p-2 border rounded" id="senhaUsuario" placeholder="Senha" type="password"/>
+<select class="w-full p-2 border rounded" id="permissaoUsuario">
+<option value="solicitante">Solicitante</option>
+<option value="admin">Admin</option>
+<option value="mista">Mista</option>
+</select>
+<button class="bg-green-600 text-white px-4 py-2 rounded" onclick="cadastrarUsuario()">Cadastrar</button>
+</div>
+<table class="w-full mt-2 border">
+<thead class="bg-gray-100">
+<tr><th class="p-2">Usuário</th><th class="p-2">Permissão</th><th class="p-2">Ações</th></tr>
+</thead>
+<tbody class="text-sm" id="tabelaUsuarios"></tbody>
+</table>
 </div>
 </div>
 </div>
-
-
 <script>
-
-function abrirAdicionarEstoque() {
-  if (usuarios[currentUser]?.permissao === "admin" || usuarios[currentUser]?.permissao === "mista") {
-    document.getElementById("estoqueScreen").classList.remove("hidden");
-  } else {
-    alert("Você não tem permissão para adicionar estoque.");
-  }
-}
-function fecharAdicionarEstoque() {
-  document.getElementById("estoqueScreen").classList.add("hidden");
-}
-function salvarNovoEstoque() {
-  const codigo = document.getElementById("novoCodigo").value.trim();
-  const descricao = document.getElementById("novaDescricao").value.trim();
-  const quantidade = parseInt(document.getElementById("novaQuantidade").value.trim());
-  const unidade = document.getElementById("novaUnidade").value.trim();
-  const localizacao = document.getElementById("novaLocalizacao").value.trim();
-  const peso = document.getElementById("novoPeso").value.trim();
-
-  if (!codigo || !descricao || !quantidade || !unidade || !localizacao || !peso) {
-    alert("Preencha todos os campos.");
-    return;
-  }
-  if (materiais[codigo]) {
-    alert("Já existe um material com esse código.");
-    return;
-  }
-
-  materiais[codigo] = {
-    quantidade: quantidade,
-    descricao: descricao,
-    unit: unidade,
-    location: localizacao,
-    weight: peso
-  };
-
-  localStorage.setItem("materiais", JSON.stringify(materiais));
-  populateMaterialDropdown();
-  fecharAdicionarEstoque();
-  showFeedback("Material adicionado com sucesso!", "bg-green-100", "text-green-700");
-
-  document.getElementById("novoCodigo").value = "";
-  document.getElementById("novaDescricao").value = "";
-  document.getElementById("novaQuantidade").value = "";
-  document.getElementById("novaUnidade").value = "";
-  document.getElementById("novaLocalizacao").value = "";
-  document.getElementById("novoPeso").value = "";
-}
-
 function abrirConfiguracoes() {
   if (usuarios[currentUser]?.permissao !== "admin") {
     alert("Apenas o usuário admin pode editar as configurações.");
@@ -794,29 +615,5 @@ window.onload = function() {
 };
 
 </script>
-
-
-<!-- Modal Adicionar Estoque -->
-<div id="estoqueScreen" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
-  <div class="bg-white p-6 rounded-lg shadow-xl max-w-md w-full overflow-y-auto max-h-[90vh] relative">
-    <button onclick="fecharAdicionarEstoque()" class="absolute top-3 right-3 text-gray-500 hover:text-red-600 text-xl font-bold">
-      &times;
-    </button>
-    <h2 class="text-xl font-bold text-gray-800 mb-4">Adicionar Estoque</h2>
-    <div class="space-y-3">
-      <input id="novoCodigo" type="text" placeholder="Código do material" class="w-full p-2 border rounded" />
-      <input id="novaDescricao" type="text" placeholder="Descrição" class="w-full p-2 border rounded" />
-      <input id="novaQuantidade" type="number" placeholder="Quantidade" class="w-full p-2 border rounded" />
-      <input id="novaUnidade" type="text" placeholder="Unidade (ex: Pç, mm)" class="w-full p-2 border rounded" />
-      <input id="novaLocalizacao" type="text" placeholder="Localização" class="w-full p-2 border rounded" />
-      <input id="novoPeso" type="text" placeholder="Peso (ex: 1.5 kg)" class="w-full p-2 border rounded" />
-    </div>
-    <div class="flex justify-end gap-2 mt-4">
-      <button onclick="fecharAdicionarEstoque()" class="border px-4 py-2 rounded">Cancelar</button>
-      <button onclick="salvarNovoEstoque()" class="bg-green-600 text-white px-4 py-2 rounded">Salvar</button>
-    </div>
-  </div>
-</div>
-
 </body>
 </html>
