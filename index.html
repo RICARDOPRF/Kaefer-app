@@ -307,11 +307,8 @@ document.getElementById("solicitacaoForm").addEventListener("submit", function (
   const tbody = document.getElementById("requestsTableBody");
   const tr = document.createElement("tr");
   const id = Math.floor(Math.random() * 10000);
-    let acoes = '';
-  if (usuarios[currentUser]?.permissao === "admin" || usuarios[currentUser]?.permissao === "mista") {
-    acoes = `<button onclick="concluir(this)" class="px-2 py-1 rounded">✔</button>
+    let acoes = `<button onclick="concluir(this)" class="px-2 py-1 rounded">✔</button>
              <button onclick="excluir(this)" class="px-2 py-1 rounded">✖</button>`;
-  }
 
   tr.innerHTML = `<td>${id}</td><td>${m}</td><td>${q}</td><td>${p}</td>
   <td>Pendente</td><td>${s}</td><td>${new Date().toLocaleString()}</td>
@@ -330,6 +327,10 @@ document.getElementById("solicitacaoForm").addEventListener("submit", function (
 });
 
 function concluir(btn) {
+  if (!(usuarios[currentUser]?.permissao === "admin" || usuarios[currentUser]?.permissao === "mista")) {
+    alert("Apenas administradores podem concluir solicitações.");
+    return;
+  }
   if (!(usuarios[currentUser]?.permissao === "admin" || usuarios[currentUser]?.permissao === "mista")) return;
   const row = btn.closest("tr");
   const codigo = row.cells[1].innerText.trim();
@@ -350,6 +351,10 @@ function concluir(btn) {
 }
 
 function excluir(btn) {
+  if (!(usuarios[currentUser]?.permissao === "admin" || usuarios[currentUser]?.permissao === "mista")) {
+    alert("Apenas administradores podem cancelar solicitações.");
+    return;
+  }
   if (!(usuarios[currentUser]?.permissao === "admin" || usuarios[currentUser]?.permissao === "mista")) return;
   const row = btn.closest("tr");
   row.cells[4].innerHTML = '<span class="text-red-700"><i class="fa-solid fa-times-circle"></i> Cancelado</span>';
