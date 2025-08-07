@@ -5,81 +5,9 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Solicitação de Materiais - KAEFER Teckma Engenharia</title>
-<script src="https://cdn.tailwindcss.com">
-let currentUser = "";
-
-function login() {
-  const u = document.getElementById("user").value.trim();
-  const p = document.getElementById("pass").value.trim();
-  const validUsers = {
-  "admin": "2025",
-  "Sabino": "1234",
-  "Ricardo": "1234",
-  "Pablo": "1234",
-  "Simone": "1234",
-  "Vinicius": "1234",
-  "Teste": "123"
-};
-
-  if (validUsers[u] === p) {
-    document.body.classList.remove("body-login");
-    currentUser = u;
-    document.getElementById("loginScreen").style.display = "none";
-    document.getElementById("app").classList.remove("hidden");
-    document.getElementById("usuarioLogado").textContent = currentUser;
-  // Mostrar filtro apenas para admin ou mista
-  if (usuarios[currentUser]?.permissao === "admin" || usuarios[currentUser]?.permissao === "mista") {
-    document.getElementById("statusFilterContainer").classList.remove("hidden");
-  }
-
-  // Filtrar solicitações
-  const statusFilter = document.getElementById("statusFilter");
-  statusFilter.addEventListener("change", function() {
-    const selected = this.value;
-    const rows = document.querySelectorAll("#requestsTableBody tr");
-    rows.forEach(row => {
-      const statusText = row.cells[4].innerText.trim();
-      if (selected === "Todos" || statusText.includes(selected)) {
-        row.style.display = "";
-      } else {
-        row.style.display = "none";
-      }
-    });
-  });
-
-  // Exibir badge de permissão no topo
-  if (usuarios[currentUser]) {
-    const perm = usuarios[currentUser].permissao;
-    const badge = document.getElementById("badgePermissao");
-    if (perm === "admin") {
-      badge.textContent = "Admin";
-      badge.className += " bg-red-100 text-red-800";
-    } else if (perm === "mista") {
-      badge.textContent = "Mista";
-      badge.className += " bg-purple-100 text-purple-800";
-    } else {
-      badge.textContent = "Solicitante";
-      badge.className += " bg-blue-100 text-blue-800";
-    }
-  }
-
-    document.getElementById("solicitante").value = currentUser;
-  } else {
-    document.getElementById("loginError").classList.remove("hidden");
-  }
-}
-
-
-function logout() {
-  location.reload();
-}
-
-function abrirConfiguracoes() {
-  window.open("configuracoes.html", "_blank");
-}
-
-</script>
+<script src="https://cdn.tailwindcss.com"></script>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <style>
         :root {
             --kaefer-blue: #0072B8;
@@ -102,32 +30,115 @@ function abrirConfiguracoes() {
             from { transform: translateY(-20px); opacity: 0; }
             to { transform: translateY(0); opacity: 1; }
         }
-
         .slide-in { animation: slideIn 0.3s ease-out; }
-    
-.body-login {
-  overflow: hidden;
-  height: 100vh;
-}
 
+        .body-login { overflow: hidden; height: 100vh; }
+
+        #lowStockAlert {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            z-index: 10;
+            max-width: 300px;
+        }
+        @media (max-width: 768px) {
+            #lowStockAlert {
+                position: relative;
+                top: auto;
+                left: auto;
+                margin-bottom: 1rem;
+            }
+        }
+
+        /* Estilos para os botões de ação na tabela de compras */
+        .icon-btn {
+            cursor: pointer;
+            font-size: 1.2em;
+            margin: 0 4px;
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            line-height: 24px;
+            text-align: center;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+        .icon-btn.aprove {
+    color: #28a745;
+    border: none;
+    background: transparent;
+}
+        .icon-btn.aprove:hover {
+            background-color: #28a745;
+            color: white;
+        }
+        .icon-btn.reprove {
+    color: #dc3545;
+    border: none;
+    background: transparent;
+}
+        .icon-btn.reprove:hover {
+            background-color: #dc3545;
+            color: white;
+        }
+        .icon-btn.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            border-color: #ccc;
+            color: #ccc;
+        }
+
+        /* Estilos para o texto de status na tabela de compras */
+        .status-text {
+            font-weight: bold;
+        }
+        .aguardando-text {
+            color: #ffc107; /* Yellow */
+        }
+        .aprovado-text {
+            color: #28a745; /* Green */
+        }
+        .reprovado-text {
+            color: #dc3545; /* Red */
+        }
+        .reprovado-icon {
+            color: #dc3545;
+            cursor: pointer;
+            margin-left: 5px;
+        }
+    </style>
+<style>
+  td button, td span[onclick], td div[onclick] {
+    cursor: pointer;
+  }
 </style>
 </head>
 <body class="bg-gray-50">
-<div class="hidden"></div>
 <!-- Login Screen com imagem de fundo -->
 <div class="relative bg-cover bg-center flex items-center justify-center" id="loginScreen" style="background-image: url('https://i.postimg.cc/tC067ZNG/TKLOGIN-Obra.png'); height: 100vh; overflow: hidden;">
 <div class="bg-white/80 shadow-lg rounded-lg p-8 w-full max-w-sm text-center backdrop-blur-sm">
-<img alt="Logo" class="mx-auto mb-6 h-20" src="https://placehold.co/300x100/0072B8/FFFFFF?text=KAEFER+Teckma"/>
+<img alt="Logo KAEFER Teckma" class="mx-auto mb-6 h-20" src="https://www.kaeferteckma.com.br/2019/wp-content/uploads/2024/05/KTE_Logo_RGB-transp-.png"/>
 <h1 class="text-xl font-bold text-gray-800 mb-4">Acesso ao Sistema</h1>
 <input class="border border-gray-300 p-2 mb-3 w-full rounded focus:outline-none focus:ring-2 focus:ring-blue-500" id="user" placeholder="Usuário" type="text"/>
 <input class="border border-gray-300 p-2 mb-4 w-full rounded focus:outline-none focus:ring-2 focus:ring-blue-500" id="pass" placeholder="Senha" type="password"/>
-<button class="bg-[#0072B8] hover:bg-[#005a91] text-white px-4 py-2 rounded w-full font-semibold" onclick="login()">Entrar</button>
+<button class="bg-[#0072B8] hover:bg-[#005a91] text-white px-4 py-2 rounded w-full font-semibold" id="btnLogin">Entrar</button>
 <p class="text-red-600 mt-3 hidden text-sm" id="loginError">Usuário ou senha inválidos</p>
 </div>
 </div>
-<div class="hidden container mx-auto px-4 py-8 max-w-6xl" id="app">
+<div class="hidden container mx-auto px-4 py-8 max-w-6xl relative" id="app">
 <!-- Top bar com usuário logado -->
-<div class="w-full flex flex-col items-end gap-2 mb-4 pr-1">
+<div class="w-full flex justify-end mb-4 pr-1">
+<div class="hidden bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-2 text-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-2" id="lowStockAlert" role="alert">
+<div class="flex items-center gap-2">
+<i class="fa-solid fa-triangle-exclamation"></i>
+<p class="font-bold">Atenção!</p>
+<p>Estoque baixo.</p>
+</div>
+<button class="bg-yellow-500 hover:bg-yellow-600 text-white px-2 py-1 rounded text-xs self-end md:self-center" onclick="openLowStockModal()">
+      Ver Materiais
+    </button>
+</div>
+<div class="flex flex-col items-end gap-2">
 <div class="flex items-center gap-4">
 <div class="text-sm text-gray-700">
 <i class="fa-solid fa-user text-gray-500"></i> <span class="text-sm">Usuário:</span> <span class="font-semibold text-blue-600" id="usuarioLogado"></span>
@@ -135,7 +146,14 @@ function abrirConfiguracoes() {
 </div>
 <button class="bg-red-600 text-white px-3 py-1 rounded text-sm" onclick="logout()">Sair</button>
 </div>
-<button class="bg-gray-300 text-gray-800 px-3 py-1 rounded text-sm hover:bg-gray-400" onclick="abrirConfiguracoes()">⚙️ Configurações</button>
+<div class="flex gap-2">
+<button class="bg-gray-300 text-gray-800 px-3 py-1 rounded text-sm hover:bg-gray-400" onclick="abrirConfiguracoes()">
+    ⚙️ Configurações
+  </button>
+<button class="bg-gray-300 text-gray-800 px-3 py-1 rounded text-sm hover:bg-gray-400" onclick="abrirDashboard()">
+    📊 Dashboard
+  </button>
+</div>
 </div>
 </div>
 <div class="flex flex-col items-center justify-center text-center mb-8">
@@ -150,6 +168,7 @@ function abrirConfiguracoes() {
 <div>
 <label class="block text-sm font-medium text-gray-700 mb-1" for="solicitante">Solicitante *</label>
 <input class="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-100 text-gray-800 shadow-sm" id="solicitante" readonly=""/>
+<input id="nomeSolicitante" name="nomeSolicitante" type="hidden"/>
 </div>
 <div>
 <label class="block font-semibold mb-1" for="prioridade">Prioridade</label>
@@ -172,6 +191,11 @@ function abrirConfiguracoes() {
 <div>
 <label class="block font-semibold mb-1">Estoque disponível</label>
 <div class="bg-gray-100 p-2 rounded text-center w-full min-h-[42px]" id="estoqueInfo">--</div>
+<div class="mt-2">
+<button class="bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-sm hidden" id="addEstoqueBtn" onclick="abrirAdicionarEstoque()" type="button">
+<i class="fa-solid fa-plus"></i> Gerenciar Estoque
+  </button>
+</div>
 </div>
 <div>
 <label class="block font-semibold mb-1">Quantidade</label>
@@ -192,11 +216,14 @@ function abrirConfiguracoes() {
 </div>
 </form>
 <div class="hidden p-3 rounded bg-gray-100 text-gray-800" id="feedback"></div>
+<!-- Material Requests Table -->
+<div class="container mx-auto px-4 py-8 max-w-6xl">
 <div class="bg-white p-6 rounded-xl shadow border border-gray-200">
 <h2 class="text-2xl font-bold text-[#0072B8] flex items-center gap-2 mb-4">
 <i class="fa-solid fa-box-open"></i> Solicitações de Materiais
   </h2>
-<div class="mb-4 hidden" id="statusFilterContainer">
+<div class="flex flex-col md:flex-row justify-between items-center mb-4 gap-2">
+<div class="flex items-center hidden" id="statusFilterContainer">
 <label class="font-semibold mr-2" for="statusFilter">Filtrar por status:</label>
 <select class="border p-1 rounded" id="statusFilter">
 <option value="Todos">Todos</option>
@@ -205,8 +232,12 @@ function abrirConfiguracoes() {
 <option value="Cancelado">Canceladas</option>
 </select>
 </div>
+<button class="bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded text-sm hidden" id="exportRequestsBtn" onclick="exportRequestsToCsv()">
+<i class="fa-solid fa-file-csv"></i> Exportar Solicitações (CSV)
+  </button>
+</div>
 <div class="overflow-x-auto">
-<table class="w-full text-sm text-left border border-gray-200 rounded overflow-hidden">
+<table class="w-full text-sm text-left border border-gray-200 rounded overflow-hidden" id="requestsTable">
 <thead class="bg-[#E3F2FD] text-[#003d66] text-sm font-semibold">
 <tr>
 <th class="py-2 px-3 border-b border-gray-300">ID</th>
@@ -215,7 +246,7 @@ function abrirConfiguracoes() {
 <th class="py-2 px-3 border-b border-gray-300">Prioridade</th>
 <th class="py-2 px-3 border-b border-gray-300">Status</th>
 <th class="py-2 px-3 border-b border-gray-300">Solicitante</th>
-<th class="py-2 px-3 border-b border-gray-300">Data</th>
+<th class="py-2 px-3 border-b border-gray-300">Data Solicitação</th><th class="py-2 px-3 border-b border-gray-300">Data Finalização</th>
 <th class="py-2 px-3 border-b border-gray-300">Ações</th>
 </tr>
 </thead>
@@ -223,259 +254,37 @@ function abrirConfiguracoes() {
 </table>
 </div>
 </div>
-<script>
-const materiais = {
-"C90322011-6": {quantidade: 2, descricao: "CURVA 90 GR RL AI ASTM A403 WP304L-W SCH 40S ANSI B16.9", location: "Almoxarifado, Prateleira 1", unit: "Pç", weight: "10.1 kg"},
-"MLV004006-4x1": {quantidade: 1, descricao: "MEIA LUVA AI ASTM A182 F304L 3000# SW", location: "Almoxarifado, Prateleira 1", unit: "Pç", weight: "0.26 kg"},
-"REC122017-3X11/4": {quantidade: 1, descricao: "RED CONC AI A403 CR304L SCH 5S MSS SP43", location: "Almoxarifado, Prateleira 1", unit: "Pç", weight: "0.34 kg"},
-"TUB315019-14": {quantidade: 2205, descricao: "TUBO AI ASTM A358 TP304L CL2 C/C SCH 5S ANSI B36.19", location: "Almoxarifado, Prateleira 1", unit: "mm", weight: "60.15 kg"},
-"TUB005009-2": {quantidade: 749, descricao: "TUBO AC ASTM A106 GR B S/C SCH 40", location: "Almoxarifado, Prateleira 1", unit: "mm", weight: "1.62 kg"},
-"MLV001006-1": {quantidade: 1, descricao: "MEIA LUVA AC ASTM A105 3000# SW B16.11", location: "Almoxarifado, Prateleira 1", unit: "Pç", weight: "0.26 kg"},
-"C45122014-12": {quantidade: 1, descricao: "CURVA 45 GR RL A403 CR304L SCH 5S MSS SP43", location: "Almoxarifado, Prateleira 1", unit: "Pç", weight: "9.65 kg"},
-"TUB115008-11/2": {quantidade: 75069, descricao: "TUBO AI ASTM A312 TP304L C/C SCH 5S ANSI B36.19", location: "Almoxarifado, Prateleira 1", unit: "mm", weight: "2.5 kg"},
-"C90195005-11/2": {quantidade: 18, descricao: "CURVA 90 GR RL AI ASTM A403 CR304L SCH5S MSS SP43", location: "Almoxarifado, Prateleira 1", unit: "Pç", weight: "0.62 kg"},
-"FG8009017-10": {quantidade: 1, descricao: "FIGURA OITO AI ASTM A240 304L 300# CONF B33014-0052", location: "Almoxarifado, Prateleira 1", unit: "Pç", weight: "0.0 kg"},
-"C90196008-3": {quantidade: 1, descricao: "CURVA 90 GR RL AI A403 CR304L 10S MSS SP43", location: "Almoxarifado, Prateleira 8", unit: "Pç", weight: "1.16 kg"},
-  "FST001011-6": {quantidade: 1, descricao: "FLANGE SOLTO AC ASTM A105 150# B16.5 ZINCADO A FOGO", location: "Almoxarifado, Prateleira 12", unit: "Pç", weight: "8.6 kg"},
-  "TUB298020-16": {quantidade: 974, descricao: "TUBO AI ASTM A358 TP304L CL2 C/C SCH STD ASME B36.19", location: "Almoxarifado, Prateleira 5", unit: "mm", weight: "258.32 kg"},
-  "FPE096012-8": {quantidade: 2, descricao: "FLANGE PESC AC ASTM A105 300# SCH 40 ANSI B16.5", location: "Almoxarifado, Prateleira 1", unit: "Pç", weight: "31.3 kg"},
-  "PES196009-4": {quantidade: 8, descricao: "PESTANA AI ASTM A403 GR WP304L-W SCH 40S MSS SP43", location: "Almoxarifado, Prateleira 1", unit: "Pç", weight: "1.81 kg"},
-  "FST002009-4": {quantidade: 8, descricao: "FLANGE SOLTO AC ASTM A105 300#", location: "Almoxarifado, Prateleira 1", unit: "Pç", weight: "10.9 kg"},
-  "TUB050009-2": {quantidade: 96016, descricao: "TUBO AI ASTM A312 TP304L C/C SCH 40S", location: "Almoxarifado, Prateleira 1", unit: "mm", weight: "1.51 kg"},
-  "TUB115013-4": {quantidade: 34695, descricao: "TUBO AI ASTM A312 TP304L C/C SCH 5S ANSI B36.19", location: "Almoxarifado, Prateleira 1", unit: "mm", weight: "504.0 kg"}
-};
-
-function populateMaterialDropdown() {
-  const matSel = document.getElementById("material");
-  matSel.innerHTML = "";
-  for (let code in materiais) {
-    const m = materiais[code];
-    const opt = document.createElement("option");
-    opt.value = code;
-    opt.textContent = `${code} - ${m.descricao}`;
-    opt.dataset.stock = m.quantidade;
-    opt.dataset.location = m.location;
-    opt.dataset.unit = m.unit;
-    opt.dataset.weight = m.weight;
-    matSel.appendChild(opt);
-  }
-}
-
-document.getElementById("materialSearch").addEventListener("input", function () {
-  const termo = this.value.toLowerCase();
-  [...document.getElementById("material").options].forEach(opt => {
-    opt.style.display = opt.textContent.toLowerCase().includes(termo) ? "" : "none";
-  });
-});
-
-document.getElementById("material").addEventListener("change", function () {
-  const opt = this.selectedOptions[0];
-  if (opt) {
-    document.getElementById("estoqueInfo").textContent = `${opt.dataset.stock} ${opt.dataset.unit} (${opt.dataset.weight})`;
-    document.getElementById("localizacao").textContent = opt.dataset.location;
-  }
-  validateForm();
-});
-
-document.getElementById("quantidade").addEventListener("input", validateForm);
-
-document.getElementById("increaseQty").onclick = () => {
-  const q = document.getElementById("quantidade");
-  q.value = parseInt(q.value) + 1;
-  validateForm();
-};
-
-document.getElementById("decreaseQty").onclick = () => {
-  const q = document.getElementById("quantidade");
-  if (parseInt(q.value) > 1) q.value = parseInt(q.value) - 1;
-  validateForm();
-};
-
-function validateForm() {
-  const m = document.getElementById("material").value;
-  const q = parseInt(document.getElementById("quantidade").value);
-  const s = parseInt(document.getElementById("material").selectedOptions[0]?.dataset.stock || 0);
-  document.getElementById("btnSolicitar").disabled = !(m && q > 0 && q <= s);
-}
-
-document.getElementById("solicitacaoForm").addEventListener("submit", function (e) {
-  e.preventDefault();
-  const s = document.getElementById("solicitante").value;
-  const m = document.getElementById("material").value;
-  const q = document.getElementById("quantidade").value;
-  const p = document.getElementById("prioridade").value;
-  const tbody = document.getElementById("requestsTableBody");
-  const tr = document.createElement("tr");
-  const id = Math.floor(Math.random() * 10000);
-    let acoes = `<button onclick="concluir(this)" class="px-2 py-1 rounded">✔</button>
-             <button onclick="excluir(this)" class="px-2 py-1 rounded">✖</button>`;
-
-  tr.innerHTML = `<td>${id}</td><td>${m}</td><td>${q}</td><td>${p}</td>
-  <td>Pendente</td><td>${s}</td><td>${new Date().toLocaleString()}</td>
-  <td>${acoes}</td>`;  tr.innerHTML = `<td>${id}</td><td>${m}</td><td>${q}</td><td>${p}</td>
-  <td>Pendente</td><td>${s}</td><td>${new Date().toLocaleString()}</td>
-  <td>${acoes}</td>`;
-  tbody.appendChild(tr);
-  localStorage.setItem("solicitacoes", tbody.innerHTML);
-  showFeedback("Solicitação enviada com sucesso!", "bg-green-100", "text-green-700");
-  this.reset();
-  document.getElementById("estoqueInfo").textContent = "--";
-  document.getElementById("localizacao").textContent = "--";
-  populateMaterialDropdown();
-  document.getElementById("solicitante").value = currentUser;
-  validateForm();
-});
-
-function concluir(btn) {
-  if (!(usuarios[currentUser]?.permissao === "admin" || usuarios[currentUser]?.permissao === "mista")) {
-    alert("Apenas administradores podem concluir solicitações.");
-    return;
-  }
-  if (!(usuarios[currentUser]?.permissao === "admin" || usuarios[currentUser]?.permissao === "mista")) return;
-  const row = btn.closest("tr");
-  const codigo = row.cells[1].innerText.trim();
-  const quantidade = parseInt(row.cells[2].innerText);
-  if (materiais[codigo]) {
-    materiais[codigo].quantidade -= quantidade;
-    populateMaterialDropdown();
-  document.getElementById("solicitante").value = currentUser;
-  }
-  row.cells[4].innerHTML = '<span class="text-green-700"><i class="fa-solid fa-check-circle"></i> Entregue</span>';
-  row.classList.add("bg-green-100");
-  [...row.querySelectorAll("button")].forEach(b => {
-    b.disabled = true;
-    b.classList.add("opacity-50");
-  });
-  showFeedback("Solicitação concluída!", "bg-green-100", "text-green-800");
-  localStorage.setItem("solicitacoes", document.getElementById("requestsTableBody").innerHTML);
-}
-
-function excluir(btn) {
-  if (!(usuarios[currentUser]?.permissao === "admin" || usuarios[currentUser]?.permissao === "mista")) {
-    alert("Apenas administradores podem cancelar solicitações.");
-    return;
-  }
-  if (!(usuarios[currentUser]?.permissao === "admin" || usuarios[currentUser]?.permissao === "mista")) return;
-  const row = btn.closest("tr");
-  row.cells[4].innerHTML = '<span class="text-red-700"><i class="fa-solid fa-times-circle"></i> Cancelado</span>';
-  row.classList.add("bg-red-100");
-  [...row.querySelectorAll("button")].forEach(b => {
-    b.disabled = true;
-    b.classList.add("opacity-50");
-  });
-  showFeedback("Solicitação cancelada.", "bg-red-100", "text-red-800");
-  localStorage.setItem("solicitacoes", document.getElementById("requestsTableBody").innerHTML);
-}
-
-function showFeedback(msg, bg, text) {
-  const fb = document.getElementById("feedback");
-  fb.textContent = msg;
-  fb.className = `block p-3 rounded ${bg} ${text}`;
-}
-window.onload = function() {
-  document.body.classList.add("body-login");
-  populateMaterialDropdown();
-  document.getElementById("solicitante").value = currentUser;
-  const saved = localStorage.getItem("solicitacoes");
-  if (saved) document.getElementById("requestsTableBody").innerHTML = saved;
-};
-
-let currentUser = "";
-
-function login() {
-  const u = document.getElementById("user").value.trim();
-  const p = document.getElementById("pass").value.trim();
-  const validUsers = {
-  "admin": "2025",
-  "Sabino": "1234",
-  "Ricardo": "1234",
-  "Pablo": "1234",
-  "Simone": "1234",
-  "Vinicius": "1234",
-  "Teste": "123"
-};
-
-  if (validUsers[u] === p) {
-    document.body.classList.remove("body-login");
-    currentUser = u;
-    document.getElementById("loginScreen").style.display = "none";
-    document.getElementById("app").classList.remove("hidden");
-    document.getElementById("usuarioLogado").textContent = currentUser;
-  // Mostrar filtro apenas para admin ou mista
-  if (usuarios[currentUser]?.permissao === "admin" || usuarios[currentUser]?.permissao === "mista") {
-    document.getElementById("statusFilterContainer").classList.remove("hidden");
-  }
-
-  // Filtrar solicitações
-  const statusFilter = document.getElementById("statusFilter");
-  statusFilter.addEventListener("change", function() {
-    const selected = this.value;
-    const rows = document.querySelectorAll("#requestsTableBody tr");
-    rows.forEach(row => {
-      const statusText = row.cells[4].innerText.trim();
-      if (selected === "Todos" || statusText.includes(selected)) {
-        row.style.display = "";
-      } else {
-        row.style.display = "none";
-      }
-    });
-  });
-
-  // Exibir badge de permissão no topo
-  if (usuarios[currentUser]) {
-    const perm = usuarios[currentUser].permissao;
-    const badge = document.getElementById("badgePermissao");
-    if (perm === "admin") {
-      badge.textContent = "Admin";
-      badge.className += " bg-red-100 text-red-800";
-    } else if (perm === "mista") {
-      badge.textContent = "Mista";
-      badge.className += " bg-purple-100 text-purple-800";
-    } else {
-      badge.textContent = "Solicitante";
-      badge.className += " bg-blue-100 text-blue-800";
-    }
-  }
-
-    document.getElementById("solicitante").value = currentUser;
-  } else {
-    document.getElementById("loginError").classList.remove("hidden");
-  }
-}
-
-
-function logout() {
-  location.reload();
-}
-
-function abrirConfiguracoes() {
-  window.open("configuracoes.html", "_blank");
-}
-
-</script>
-<script>
-function aplicarTempos() {
-  const tempoAlta = localStorage.getItem("tempoAlta") || "Entrega imediata";
-  const tempoMedia = localStorage.getItem("tempoMedia") || "Entrega em 2 horas";
-  const tempoBaixa = localStorage.getItem("tempoBaixa") || "Entrega em 4 horas";
-
-  const prioridade = document.getElementById("prioridade");
-  if (prioridade && prioridade.options.length >= 3) {
-    prioridade.options[0].text = `Baixa (${tempoBaixa})`;
-    prioridade.options[1].text = `Média (${tempoMedia})`;
-    prioridade.options[2].text = `Alta (${tempoAlta})`;
-  }
-}
-
-window.onload = function() {
-  document.body.classList.add("body-login");
-  populateMaterialDropdown();
-  document.getElementById("solicitante").value = currentUser;
-  const saved = localStorage.getItem("solicitacoes");
-  if (saved) document.getElementById("requestsTableBody").innerHTML = saved;
-  aplicarTempos();
-};
-</script>
+</div>
+<!-- Purchase Requests Table -->
+<div class="container mx-auto px-4 py-8 max-w-6xl mt-6">
+<div class="bg-white p-6 rounded-xl shadow border border-gray-200">
+<div class="px-3 py-2 border-b flex items-center justify-between">
+<h2 class="text-xl font-bold text-blue-800 flex items-center">
+<svg class="w-6 h-6 mr-2 text-blue-800" fill="currentColor" viewbox="0 0 20 20"><path d="M3 3a1 1 0 011-1h12a1 1 0 011 1v2H3V3zM3 6h14v11a1 1 0 01-1 1H4a1 1 0 01-1-1V6zm4 2a1 1 0 100 2h6a1 1 0 100-2H7z"></path></svg>
+        Solicitação de Compras
+      </h2>
+</div>
+<div class="overflow-x-auto p-3">
+<table class="w-full text-sm text-left border border-gray-200 rounded overflow-hidden" id="comprasTable">
+<thead class="bg-[#E3F2FD] text-[#003d66] text-sm font-semibold">
+<tr>
+<th class="py-2 px-3">ID</th>
+<th class="py-2 px-3">Material</th>
+<th class="py-2 px-3">Qtd</th>
+<th class="py-2 px-3">Prioridade</th>
+<th class="py-2 px-3">Status</th>
+<th class="py-2 px-3">Solicitante</th>
+<th class="py-2 px-3">AP1</th>
+<th class="py-2 px-3">AP2</th>
+<th class="py-2 px-3">AP3</th>
+<th class="py-2 px-3">Ações</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-gray-200 bg-white" id="comprasTableBody"></tbody>
+</table>
+</div>
+</div>
+</div>
 <!-- Modal de Configuração Interna -->
 <div class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center" id="configScreen">
 <div class="bg-white p-6 rounded-lg shadow-xl max-w-md w-full overflow-y-auto max-h-[90vh] relative">
@@ -512,113 +321,1569 @@ window.onload = function() {
 <option value="solicitante">Solicitante</option>
 <option value="admin">Admin</option>
 <option value="mista">Mista</option>
+<option value="master">Master</option>
+</select>
+<select class="w-full p-2 border rounded" id="aprovadorUsuario">
+<option value="">Não é Aprovador</option>
+<option value="ap1">Aprovador 1</option>
+<option value="ap2">Aprovador 2</option>
+<option value="ap3">Aprovador 3</option>
 </select>
 <button class="bg-green-600 text-white px-4 py-2 rounded" onclick="cadastrarUsuario()">Cadastrar</button>
 </div>
 <table class="w-full mt-2 border">
 <thead class="bg-gray-100">
-<tr><th class="p-2">Usuário</th><th class="p-2">Permissão</th><th class="p-2">Ações</th></tr>
+<tr><th class="p-2">Usuário</th><th class="p-2">Permissão</th><th class="p-2">Aprovador</th><th class="p-2">Ações</th></tr>
 </thead>
 <tbody class="text-sm" id="tabelaUsuarios"></tbody>
 </table>
 </div>
+<hr class="my-6 border-t border-gray-300"/>
+<div class="mt-6">
+<h2 class="text-lg font-bold text-gray-800 mb-2">Limpar Histórico</h2>
+<button class="bg-red-600 text-white px-4 py-2 rounded w-full hover:bg-red-700 mb-2" onclick="limparHistoricoSolicitacoes()">
+<i class="fa-solid fa-eraser"></i> Limpar Histórico de Solicitações
+  </button>
+<button class="bg-red-600 text-white px-4 py-2 rounded w-full hover:bg-red-700" onclick="limparHistoricoCompras()">
+<i class="fa-solid fa-trash"></i> Apagar histórico de Compras
+</button>
+</div>
+</div>
+</div>
+<!-- Modal Adicionar Estoque -->
+<div class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center" id="estoqueScreen">
+<div class="bg-white p-6 rounded-lg shadow-xl max-w-md w-full overflow-y-auto max-h-[90vh] relative">
+<button class="absolute top-3 right-3 text-gray-500 hover:text-red-600 text-xl font-bold" onclick="fecharAdicionarEstoque()">
+      ×
+    </button>
+<h2 class="text-xl font-bold text-gray-800 mb-4">Gerenciar Estoque</h2>
+<div class="space-y-3">
+<h3 class="text-lg font-semibold mt-4">Adicionar Novo Material</h3>
+<input class="w-full p-2 border rounded" id="novoCodigo" placeholder="Código do material" type="text"/>
+<input class="w-full p-2 border rounded" id="novaDescricao" placeholder="Descrição" type="text"/>
+<input class="w-full p-2 border rounded" id="novaQuantidade" placeholder="Quantidade" type="number"/>
+<input class="w-full p-2 border rounded" id="novaUnidade" placeholder="Unidade (ex: Pç, mm)" type="text"/>
+<input class="w-full p-2 border rounded" id="novaLocalizacao" placeholder="Localização" type="text"/>
+<input class="w-full p-2 border rounded" id="novoPeso" placeholder="Peso (ex: 1.5 kg)" type="text"/>
+</div>
+<div class="flex justify-end gap-2 mt-4">
+<button class="border px-4 py-2 rounded" onclick="fecharAdicionarEstoque()">Cancelar</button>
+<button class="bg-green-600 text-white px-4 py-2 rounded" onclick="salvarNovoEstoque()">Salvar</button>
+</div>
+<hr class="my-6 border-t border-gray-300"/>
+<h3 class="text-lg font-semibold mt-4">Materiais Existentes</h3>
+<div class="space-y-2 max-h-48 overflow-y-auto border p-2 rounded" id="existingMaterialsList">
+<!-- Existing materials will be listed here -->
+</div>
+<hr class="my-6 border-t border-gray-300"/>
+<h3 class="text-lg font-semibold mt-4">Importar Estoque (CSV)</h3>
+<p class="text-sm text-gray-600 mb-2">Formato esperado: Código,Descrição,Quantidade,Unidade,Localização,Peso</p>
+<button class="bg-gray-300 hover:bg-gray-400 text-gray-800 px-3 py-1 rounded text-sm mb-2" onclick="downloadStockTemplate()">
+<i class="fa-solid fa-download"></i> Baixar Template CSV
+    </button>
+<input accept=".csv" class="w-full p-2 border rounded mb-2" id="importStockFile" type="file"/>
+<div class="flex justify-end gap-2 mt-4">
+<button class="bg-blue-600 text-white px-4 py-2 rounded" onclick="importStockFromCsv()">
+<i class="fa-solid fa-upload"></i> Importar
+      </button>
+</div>
+<hr class="my-6 border-t border-gray-300"/>
+<div class="mt-4 text-center">
+<button class="bg-gray-500 hover:bg-gray-600 text-white px-3 py-1 rounded text-sm hidden" id="exportStockBtn" onclick="exportStockToCsv()">
+<i class="fa-solid fa-file-csv"></i> Exportar Estoque (CSV)
+      </button>
+</div>
+<button class="bg-red-600 text-white px-4 py-2 rounded w-full hover:bg-red-700 mt-4" onclick="limparEstoque()">
+<i class="fa-solid fa-trash"></i> Limpar Estoque
+    </button>
+</div>
+</div>
+<!-- Novo Modal para Materiais com Estoque Baixo -->
+<div class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center" id="lowStockModal">
+<div class="bg-white p-6 rounded-lg shadow-xl max-w-md w-full overflow-y-auto max-h-[90vh] relative">
+<button class="absolute top-3 right-3 text-gray-500 hover:text-red-600 text-xl font-bold" onclick="closeLowStockModal()">
+      ×
+    </button>
+<h2 class="text-xl font-bold text-gray-800 mb-4">Materiais com Estoque Baixo</h2>
+<div class="space-y-2" id="lowStockList">
+<!-- Lista de materiais com estoque baixo será populada aqui -->
+</div>
+<div class="flex justify-end gap-2 mt-4">
+<button class="border px-4 py-2 rounded" onclick="closeLowStockModal()">Fechar</button>
+</div>
 </div>
 </div>
 <script>
-function abrirConfiguracoes() {
-  if (usuarios[currentUser]?.permissao !== "admin") {
-    alert("Apenas o usuário admin pode editar as configurações.");
-    return;
-  }
-  document.getElementById("configScreen").classList.remove("hidden");
-  document.getElementById("tempoAlta").value = localStorage.getItem("tempoAlta") || "Entrega imediata";
-  document.getElementById("tempoMedia").value = localStorage.getItem("tempoMedia") || "Entrega em 2 horas";
-  document.getElementById("tempoBaixa").value = localStorage.getItem("tempoBaixa") || "Entrega em 4 horas";
-}
-function fecharConfig() {
-  document.getElementById("configScreen").classList.add("hidden");
-}
-function salvarConfiguracoes() {
-  localStorage.setItem("tempoAlta", document.getElementById("tempoAlta").value);
-  localStorage.setItem("tempoMedia", document.getElementById("tempoMedia").value);
-  localStorage.setItem("tempoBaixa", document.getElementById("tempoBaixa").value);
-  aplicarTempos();
-  fecharConfig();
-}
+    let currentUser = "";
+    let currentUserPermissao = ""; // Added to store current user's permission
+    let currentUserApprover = ""; // Added to store current user's approver role
+    const usuariosKey = "usuarios";
+    const LOW_STOCK_THRESHOLD = 5;
 
-// Gerenciamento de Usuários
-const usuariosKey = "usuarios";
-let usuarios = JSON.parse(localStorage.getItem(usuariosKey)) || {
-  "admin": { senha: "2025", permissao: "admin" },
-  "Ricardo": { senha: "1234", permissao: "solicitante" },
-  "Sabino": { senha: "1234", permissao: "mista" },
-  "Teste": { senha: "123", permissao: "mista" }
-};
+    let materiais = JSON.parse(localStorage.getItem("materiais")) || {
+        "FST001011": { "descricao": "FLANGE SOLTO AC ASTM A105 150# B16.5 ZINCADO A FOGO", "quantidade": 4, "unit": "Pç", "location": "Almoxarifado Central", "weight": "34.4" },
+        "TUB298020": { "descricao": "TUBO AI ASTM A358 TP304L CL2 C/C SCH STD ASME B36.19", "quantidade": 4, "unit": "mm", "location": "Almoxarifado Central", "weight": "390.7" },
+        "C90196008": { "descricao": "CURVA 90 GR RL AI A403 CR304L 10S MSS SP43", "quantidade": 6, "unit": "Pç", "location": "Almoxarifado Central", "weight": "6.96" },
+        "FPE096012": { "descricao": "FLANGE PESC AC ASTM A105 300# SCH 40 ANSI B16.5", "quantidade": 2, "unit": "Pç", "location": "Almoxarifado Central", "weight": "62.6" },
+        "TUB050013": { "descricao": "TUBO AI ASTM A312 TP304L C/C SCH 40S", "quantidade": 6, "unit": "mm", "location": "Almoxarifado Central", "weight": "73.70" },
+        "PES196009": { "descricao": "PESTANA AI ASTM A403 GR WP304L-W SCH 40S MSS SP43", "quantidade": 8, "unit": "Pç", "location": "Almoxarifado Central", "weight": "14.48" },
+        "FST002009": { "descricao": "FLANGE SOLTO AC ASTM A105 300#", "quantidade": 7, "unit": "Pç", "location": "Almoxarifado Central", "weight": "87.2" },
+        "PES196012": { "descricao": "PESTANA AI ASTM A403 GR WP304L-W SCH 40S MSS SP43", "quantidade": 4, "unit": "Pç", "location": "Almoxarifado Central", "weight": "23.56" },
+        "PES216011": { "descricao": "PESTANA AI ASTM A403 GR WP304L-W SCH 5S MSS-SP-43", "quantidade": 4, "unit": "Pç", "location": "Almoxarifado Central", "weight": "4.2" },
+        "FST001006": { "descricao": "FLANGE SOLTO AC ASTM A105 150# B16.5 ZINCADO A FOGO", "quantidade": 2, "unit": "Pç", "location": "Almoxarifado Central", "weight": "4.6" },
+        "TUB115009": { "descricao": "TUBO AI ASTM A312 TP304L C/C SCH 5S ANSI B36.19", "quantidade": 26, "unit": "mm", "location": "Almoxarifado Central", "weight": "75.09" },
+        "TUB050009": { "descricao": "TUBO AI ASTM A312 TP304L C/C SCH 40S", "quantidade": 24, "unit": "mm", "location": "Almoxarifado Central", "weight": "69.9" },
+        "TUB115013": { "descricao": "TUBO AI ASTM A312 TP304L C/C SCH 5S ANSI B36.19", "quantidade": 14, "unit": "mm", "location": "Almoxarifado Central", "weight": "1800" },
+        "C90322011": { "descricao": "CURVA 90 GR RL AI ASTM A403 WP304L-W SCH 40S ANSI B16.9", "quantidade": 2, "unit": "Pç", "location": "Almoxarifado Central", "weight": "20.2" },
+        "MLV004006": { "descricao": "MEIA LUVA AI ASTM A182 F304L 3000# SW", "quantidade": 1, "unit": "Pç", "location": "Almoxarifado Central", "weight": "0.26" },
+        "REC122017": { "descricao": "RED CONC AI A403 CR304L SCH 5S MSS SP43", "quantidade": 1, "unit": "Pç", "location": "Almoxarifado Central", "weight": "0.34" },
+        "TUB315019": { "descricao": "TUBO AI ASTM A358 TP304L CL2 C/C SCH 5S ANSI B36.19", "quantidade": 3, "unit": "mm", "location": "Almoxarifado Central", "weight": "76.8" },
+        "TUB005009": { "descricao": "TUBO AC ASTM A106 GR B S/C SCH 40", "quantidade": 3, "unit": "mm", "location": "Almoxarifado Central", "weight": "4.071" },
+        "MLV001006": { "descricao": "MEIA LUVA AC ASTM A105 3000# SW B16.11", "quantidade": 1, "unit": "Pç", "location": "Almoxarifado Central", "weight": "0.26" },
+        "C45122014": { "descricao": "CURVA 45 GR RL A403 CR304L SCH 5S MSS SP43", "quantidade": 1, "unit": "Pç", "location": "Almoxarifado Central", "weight": "9.65" },
+        "TUB115008": { "descricao": "TUBO AI ASTM A312 TP304L C/C SCH 5S ANSI B36.19", "quantidade": 30, "unit": "mm", "location": "Almoxarifado Central", "weight": "60" },
+        "C90195005": { "descricao": "CURVA 90 GR RL AI ASTM A403 CR304L SCH5S MSS SP43", "quantidade": 18, "unit": "Pç", "location": "Almoxarifado Central", "weight": "11.16" },
+        "TEE071005": { "descricao": "TE AI ASTM A403 WP304L SCH 5S MSS-SP-43", "quantidade": 2, "unit": "Pç", "location": "Almoxarifado Central", "weight": "0.58" },
+        "C45122005": { "descricao": "CURVA 45 GR RL AI ASTM A403 CR304L SCH5S MSS SP43", "quantidade": 4, "unit": "Pç", "location": "Almoxarifado Central", "weight": "0.36" },
+        "REC207020": { "descricao": "REDUCAO CONC AI ASTM A403 WP304L-W SCH 40S ANSI B16.9", "quantidade": 1, "unit": "Pç", "location": "Almoxarifado Central", "weight": "1.27" },
+        "FST002005": { "descricao": "FLANGE SOLTO AC ASTM A105 300#", "quantidade": 1, "unit": "Pç", "location": "Almoxarifado Central", "weight": "2.9" },
+        "C45307005": { "descricao": "CURVA 45 GR RL AI ASTM A403 WP304L-W SCH 40S ANSI B16.9", "quantidade": 10, "unit": "Pç", "location": "Almoxarifado Central", "weight": "1.9" },
+        "FPE096008": { "descricao": "FLANGE PESC AC ASTM A105 300# SCH 40 ANSI B16.5", "quantidade": 1, "unit": "Pç", "location": "Almoxarifado Central", "weight": "6.6" },
+        "FST002011": { "descricao": "FLANGE SOLTO AC ASTM A105 300#", "quantidade": 2, "unit": "Pç", "location": "Almoxarifado Central", "weight": "35.4" },
+        "PES196011": { "descricao": "PESTANA AI ASTM A403 GR WP304L-W SCH 40S MSS SP43", "quantidade": 2, "unit": "Pç", "location": "Almoxarifado Central", "weight": "7.44" },
+        "REX197027": { "descricao": "REDUCAO EXC AI ASTM A403 WP304L-W SCH 40S ANSI B16.9", "quantidade": 1, "unit": "Pç", "location": "Almoxarifado Central", "weight": "6.49" },
+        "C90322012": { "descricao": "CURVA 90 GR RL AI ASTM A403 WP304L-W SCH 40S ANSI B16.9", "quantidade": 10, "unit": "Pç", "location": "Almoxarifado Central", "weight": "213" },
+        "REX184039": { "descricao": "REDUCAO EXC AI A403 GR WP304L-W SCH STD ANSI B16.9", "quantidade": 1, "unit": "Pç", "location": "Almoxarifado Central", "weight": "33.1" },
+        "C90322013": { "descricao": "CURVA 90 GR RL AI ASTM A403 WP304L-W SCH 40S ANSI B16.9", "quantidade": 4, "unit": "Pç", "location": "Almoxarifado Central", "weight": "150.4" },
+        "REX197032": { "descricao": "REDUCAO EXC AI ASTM A403 WP304L-W SCH 40S ANSI B16.9", "quantidade": 1, "unit": "Pç", "location": "Almoxarifado Central", "weight": "15" },
+        "TUB050005": { "descricao": "TUBO AI ASTM A312 TP304L C/C SCH 40S", "quantidade": 6, "unit": "mm", "location": "Almoxarifado Central", "weight": "7.5" },
+        "TUB050004": { "descricao": "TUBO AI ASTM A312 TP304L C/C SCH 40S", "quantidade": 20, "unit": "mm", "location": "Almoxarifado Central", "weight": "17.0" },
+        "TUB115015": { "descricao": "TUBO AI ASTM A312 TP304L C/C SCH 5S ANSI B36.19", "quantidade": 20, "unit": "mm", "location": "Almoxarifado Central", "weight": "688.8" },
+        "TUB315022": { "descricao": "TUBO AI ASTM A358 TP304L CL2 C/C SCH 5S ANSI B36.19", "quantidade": 6, "unit": "mm", "location": "Almoxarifado Central", "weight": "1234.6" },
+        "C45122018": { "descricao": "CURVA 45 GR RL A403 CR304L SCH 5S MSS SP43", "quantidade": 4, "unit": "Pç", "location": "Almoxarifado Central", "weight": "164" },
+        "FPA112008": { "descricao": "FLANGE PAD - 300# - ASTM A240 Gr 304L - B23014-0069 - TIPO 1", "quantidade": 18, "unit": "Pç", "location": "Almoxarifado Central", "weight": "0" },
+        "FPA111008": { "descricao": "FLANGE PAD - 150# - ASTM A240 Gr 304L - B23014-0068 - TIPO 1", "quantidade": 2, "unit": "Pç", "location": "Almoxarifado Central", "weight": "0" },
+        "FG8001017": { "descricao": "FIGURA OITO AC ASTM A283 GR C 150# DES B33014-0052", "quantidade": 4, "unit": "Pç", "location": "Almoxarifado Central", "weight": "0" },
+        "FG8009020": { "descricao": "FIGURA OITO AI ASTM A240 304L 300# CONF B33014-0052", "quantidade": 1, "unit": "Pç", "location": "Almoxarifado Central", "weight": "0" },
+        "FG8003019": { "descricao": "FIGURA OITO AC ASTM A283 GR C 300# DES B33014-0052", "quantidade": 2, "unit": "Pç", "location": "Almoxarifado Central", "weight": "0" },
+        "CET001029": { "descricao": "PARAFUSO ESTOJO ASTM A193 GR B7 CL 2A & PORCAS SEXT PES ASTM A194 GR 2H", "quantidade": 8, "unit": "Pç", "location": "Almoxarifado Central", "weight": "0" },
+        "FG8009017": { "descricao": "FIGURA OITO AI ASTM A240 304L 300# CONF B33014-0052", "quantidade": 1, "unit": "Pç", "location": "Almoxarifado Central", "weight": "0" },
+        "ENR000049": { "descricao": "ENG RAPIDO MACHO P/ MANG DN 1\" C/ ROSCA NPT INOX 316L REF UEL FIG.21", "quantidade": 1, "unit": "Pç", "location": "Almoxarifado Central", "weight": "0" }
+    };
 
-function salvarUsuarios() {
-  localStorage.setItem(usuariosKey, JSON.stringify(usuarios));
-  listarUsuarios();
-}
+    function inicializarUsuarios() {
+        const usuariosFixos = {
+            "admin": { senha: "2025", permissao: "admin", nomeCompleto: "Admin (ADM)", aprovador: "" },
+            "Ricardo": { senha: "1234", permissao: "master", nomeCompleto: "Ricardo (SUP)", aprovador: "ap1" },
+            "Sabino": { senha: "1234", permissao: "master", nomeCompleto: "Sabino (GP)", aprovador: "ap2" },
+            "Pablo": { senha: "1234", permissao: "master", nomeCompleto: "Pablo (CO)", aprovador: "ap3" },
+            "Simone": { senha: "1234", permissao: "solicitante", nomeCompleto: "Simone (ENC)", aprovador: "" },
+            "Vinicius": { senha: "1234", permissao: "solicitante", nomeCompleto: "Vinicius (SOL)", aprovador: "" },
+            "Teste": { senha: "123", permissao: "mista", nomeCompleto: "Teste (Mista)", aprovador: "" }
+        };
+        let usuariosAtuais = JSON.parse(localStorage.getItem(usuariosKey));
+        if (!usuariosAtuais) {
+            localStorage.setItem(usuariosKey, JSON.stringify(usuariosFixos));
+        } else {
+            let alterado = false;
+            for (let nome in usuariosFixos) {
+                if (!usuariosAtuais[nome]) {
+                    usuariosAtuais[nome] = usuariosFixos[nome];
+                    alterado = true;
+                } else {
+                    // Ensure nomeCompleto and aprovador are present for existing users
+                    if (!usuariosAtuais[nome].nomeCompleto) {
+                        usuariosAtuais[nome].nomeCompleto = usuariosFixos[nome].nomeCompleto;
+                        alterado = true;
+                    }
+                    if (usuariosAtuais[nome].aprovador === undefined) {
+                        usuariosAtuais[nome].aprovador = usuariosFixos[nome].aprovador;
+                        alterado = true;
+                    }
+                }
+            }
+            if (alterado) {
+                localStorage.setItem(usuariosKey, JSON.stringify(usuariosAtuais));
+            }
+        }
+    }
 
-function listarUsuarios() {
-  const tbody = document.getElementById("tabelaUsuarios");
-  if (!tbody) return;
-  tbody.innerHTML = "";
-  Object.entries(usuarios).forEach(([user, info]) => {
-    const tr = document.createElement("tr");
-    tr.innerHTML = `
-      <td class="p-2">${user}</td>
-      <td class="p-2">
-        ${info.permissao === "admin" 
-            ? '<span class="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs"><i class="fa-solid fa-crown"></i> Admin</span>' 
-            : info.permissao === "mista" 
-            ? '<span class="bg-purple-100 text-purple-800 px-2 py-1 rounded-full text-xs"><i class="fa-solid fa-gear"></i> Mista</span>' 
-            : '<span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs"><i class="fa-solid fa-box"></i> Solicitante</span>'}
-      </td>
-      <td class="p-2 space-x-2">
-        <button onclick="editarUsuario('${user}')" class="text-blue-600">Editar</button>
-        <button onclick="excluirUsuario('${user}')" class="text-red-600">Excluir</button>
-      </td>`;
-    tbody.appendChild(tr);
-  });
-}
+    let usuarios = JSON.parse(localStorage.getItem(usuariosKey));
 
-function cadastrarUsuario() {
-  const user = document.getElementById("novoUsuario").value.trim();
-  const senha = document.getElementById("senhaUsuario").value.trim();
-  const permissao = document.getElementById("permissaoUsuario").value;
-  if (!user || !senha) return alert("Preencha todos os campos.");
-  usuarios[user] = { senha, permissao };
-  salvarUsuarios();
-}
+    function login() {
+        const u = document.getElementById("user").value.trim();
+        const p = document.getElementById("pass").value.trim();
 
-function editarUsuario(user) {
-  const novaSenha = prompt("Nova senha para " + user + ":");
-  const novaPerm = prompt("Nova permissão (admin/solicitante):", usuarios[user].permissao);
-  if (novaSenha && novaPerm) {
-    usuarios[user].senha = novaSenha;
-    usuarios[user].permissao = novaPerm;
-    salvarUsuarios();
-  }
-}
+        usuarios = JSON.parse(localStorage.getItem(usuariosKey));
 
-function excluirUsuario(user) {
-  if (confirm("Deseja excluir o usuário " + user + "?")) {
-    delete usuarios[user];
-    salvarUsuarios();
-  }
-}
+        if (usuarios[u] && usuarios[u].senha === p) {
+            document.body.classList.remove("body-login");
+            currentUser = u;
+            currentUserPermissao = usuarios[u].permissao; // Store permission
+            currentUserApprover = usuarios[u].aprovador; // Store approver role
+            document.getElementById("loginScreen").style.display = "none";
+            document.getElementById("app").classList.remove("hidden");
+            document.getElementById("usuarioLogado").textContent = usuarios[u].nomeCompleto; // Show full name
+            document.getElementById("loginError").classList.add("hidden");
 
-window.onload = function() {
-  document.body.classList.add("body-login");
-  populateMaterialDropdown();
-  document.getElementById("solicitante").value = currentUser;
-  const saved = localStorage.getItem("solicitacoes");
-  if (saved) document.getElementById("requestsTableBody").innerHTML = saved;
-  aplicarTempos();
-  listarUsuarios();
-};
+            if (currentUserPermissao === "admin" || currentUserPermissao === "mista") {
+                document.getElementById("statusFilterContainer").classList.remove("hidden");
+                document.getElementById("exportRequestsBtn").classList.remove("hidden");
+                document.getElementById("addEstoqueBtn").classList.remove("hidden");
+                checkLowStock();
+            } else {
+                document.getElementById("statusFilterContainer").classList.add("hidden");
+                document.getElementById("exportRequestsBtn").classList.add("hidden");
+                document.getElementById("addEstoqueBtn").classList.add("hidden");
+                document.getElementById("lowStockAlert").classList.add("hidden");
+            }
+
+            const badge = document.getElementById("badgePermissao");
+            badge.textContent = currentUserPermissao.charAt(0).toUpperCase() + currentUserPermissao.slice(1);
+            badge.className = "ml-2 text-xs px-2 py-1 rounded-full";
+            if (currentUserPermissao === "admin") {
+                badge.classList.add("bg-red-100", "text-red-800");
+            } else if (currentUserPermissao === "mista") {
+                badge.classList.add("bg-purple-100", "text-purple-800");
+            } else if (currentUserPermissao === "master") {
+                badge.classList.add("bg-orange-100", "text-orange-800");
+            }
+            else {
+                badge.classList.add("bg-blue-100", "text-blue-800");
+            }
+
+            document.getElementById("solicitante").value = usuarios[u].nomeCompleto; // Auto-fill with full name
+            document.getElementById("nomeSolicitante").value = usuarios[u].nomeCompleto; // Set hidden field
+            populateMaterialDropdown();
+            loadRequestsTable();
+            loadComprasTable(); // Load purchase requests
+            aplicarTempos();
+            updateApprovalButtonsVisibility(); // Update button visibility on login
+        } else {
+            document.getElementById("loginError").classList.remove("hidden");
+        }
+    }
+
+    function logout() {
+        location.reload();
+    }
+
+    function populateMaterialDropdown() {
+        const matSel = document.getElementById("material");
+        matSel.innerHTML = "";
+        for (let code in materiais) {
+            const m = materiais[code];
+            const opt = document.createElement("option");
+            opt.value = code;
+            opt.textContent = `${code} - ${m.descricao}`;
+            opt.dataset.stock = m.quantidade;
+            opt.dataset.location = m.location;
+            opt.dataset.unit = m.unit;
+            opt.dataset.weight = m.weight;
+            matSel.appendChild(opt);
+        }
+    }
+
+    document.getElementById("materialSearch").addEventListener("input", function () {
+        const termo = this.value.toLowerCase();
+        [...document.getElementById("material").options].forEach(opt => {
+            opt.style.display = opt.textContent.toLowerCase().includes(termo) ? "" : "none";
+        });
+    });
+
+    document.getElementById("material").addEventListener("change", function () {
+        const opt = this.selectedOptions[0];
+        if (opt) {
+            document.getElementById("estoqueInfo").textContent = `${opt.dataset.stock} ${opt.dataset.unit} (${opt.dataset.weight})`.replace(/\)$/, ' Kg)');
+            document.getElementById("localizacao").textContent = opt.dataset.location;
+        }
+        validateForm();
+    });
+
+    document.getElementById("quantidade").addEventListener("input", validateForm);
+
+    document.getElementById("increaseQty").onclick = () => {
+        const q = document.getElementById("quantidade");
+        q.value = parseInt(q.value) + 1;
+        validateForm();
+    };
+
+    document.getElementById("decreaseQty").onclick = () => {
+        const q = document.getElementById("quantidade");
+        if (parseInt(q.value) > 1) q.value = parseInt(q.value) - 1;
+        validateForm();
+    };
+
+    function validateForm() {
+        const m = document.getElementById("material").value;
+        const q = parseInt(document.getElementById("quantidade").value);
+        const p = document.getElementById("prioridade").value;
+        const s = document.getElementById("solicitante").value;
+        document.getElementById("btnSolicitar").disabled = !(m && q > 0 && p && s);
+    }
+
+    document.getElementById("solicitacaoForm").addEventListener("submit", function (e) {
+        e.preventDefault();
+        const solicitante = document.getElementById("solicitante").value;
+        const materialCode = document.getElementById("material").value;
+        const materialDescription = document.getElementById("material").selectedOptions[0].textContent;
+        const requestedQuantidade = parseInt(document.getElementById("quantidade").value);
+        const prioridade = document.getElementById("prioridade").value;
+        const dataSolicitacao = new Date().toLocaleString("pt-BR", { day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit" });
+        const availableStock = parseInt(document.getElementById("material").selectedOptions[0]?.dataset.stock || 0);
+
+        if (requestedQuantidade <= availableStock) {
+            const id = Math.floor(Math.random() * 100000);
+
+            const tbody = document.getElementById("requestsTableBody");
+            const tr = document.createElement("tr");
+            tr.setAttribute('data-id', id);
+            tr.setAttribute('data-status', 'Pendente');
+            tr.setAttribute('data-solicitante', solicitante);
+
+            tr.innerHTML = `
+                <td>${id}</td>
+                <td>${materialCode} - ${materialDescription.split(' - ')[1]}</td>
+                <td>${requestedQuantidade}</td>
+                <td>${prioridade}</td>
+                <td>Pendente</td>
+                <td>${solicitante}</td>
+                <td>${dataSolicitacao}</td>
+                <td></td>
+                <td>
+                    <button onclick="concluir(this)">✔</button>
+                    <button onclick="excluir(this)">✖</button>
+                </td>`;
+            tbody.appendChild(tr);
+            saveRequestsTable();
+            showFeedback("Solicitação enviada com sucesso!", "bg-green-100", "text-green-700");
+            this.reset();
+            document.getElementById("estoqueInfo").textContent = "--";
+            document.getElementById("quantidade").value = "1";
+            document.getElementById("localizacao").textContent = "--";
+            populateMaterialDropdown();
+            document.getElementById("solicitante").value = usuarios[currentUser].nomeCompleto;
+            validateForm();
+        } else {
+            const missingQuantidade = requestedQuantidade - availableStock;
+            const confirmPurchase = confirm(`Só existem ${availableStock} unidades disponíveis. Deseja enviar as ${missingQuantidade} unidades restantes para a tabela de Solicitação de Compras?`);
+
+            if (confirmPurchase) {
+                if (availableStock > 0) {
+                    const idMaterialRequest = Math.floor(Math.random() * 100000);
+                    const tbodyMaterial = document.getElementById("requestsTableBody");
+                    const trMaterial = document.createElement("tr");
+                    trMaterial.setAttribute('data-id', idMaterialRequest);
+                    trMaterial.setAttribute('data-status', 'Pendente');
+                    trMaterial.setAttribute('data-solicitante', solicitante);
+                    trMaterial.innerHTML = `
+                        <td>${idMaterialRequest}</td>
+                        <td>${materialCode} - ${materialDescription.split(' - ')[1]}</td>
+                        <td>${availableStock}</td>
+                        <td>${prioridade}</td>
+                        <td>Pendente</td>
+                        <td>${solicitante}</td>
+                        <td>${dataSolicitacao}</td>
+                        <td></td>
+                        <td>
+                            <button onclick="concluir(this)">✔</button>
+                            <button onclick="excluir(this)">✖</button>
+                        </td>`;
+                    tbodyMaterial.appendChild(trMaterial);
+                    saveRequestsTable();
+                    showFeedback(`Solicitação de ${availableStock} unidades enviada para Materiais.`, "bg-green-100", "text-green-700");
+                } else {
+                    showFeedback("Estoque disponível é 0. Nenhuma solicitação de material foi criada.", "bg-yellow-100", "text-yellow-700");
+                }
+
+                adicionarNaTabelaCompras(materialCode, missingQuantidade, prioridade, solicitante);
+                showFeedback(`Solicitação de compra para ${missingQuantidade} unidades de ${materialCode} criada.`, "bg-blue-100", "text-blue-700");
+
+                this.reset();
+                document.getElementById("estoqueInfo").textContent = "--";
+                document.getElementById("quantidade").value = "1";
+                document.getElementById("localizacao").textContent = "--";
+                populateMaterialDropdown();
+                document.getElementById("solicitante").value = usuarios[currentUser].nomeCompleto;
+                validateForm();
+
+            } else {
+                alert("Por favor, ajuste a quantidade solicitada para continuar.");
+            }
+        }
+    });
+
+    function concluir(btn) {
+    if (!(currentUserPermissao === "admin" || currentUserPermissao === "mista" || currentUserPermissao === "master")) {
+        alert("Você não tem permissão para concluir solicitações.");
+        return;
+    }
+        const row = btn.closest("tr");
+        const dataFinal = new Date().toLocaleString("pt-BR", {
+            day: "2-digit", month: "2-digit", year: "numeric",
+            hour: "2-digit", minute: "2-digit"
+        });
+
+        const materialCellContent = row.cells[1].textContent;
+        const materialCode = materialCellContent.split(" - ")[0];
+
+        const originalSolicitante = row.getAttribute('data-solicitante');
+
+        const quantidadeSolicitada = parseInt(row.cells[2].textContent);
+        if (materiais[materialCode]) {
+            materiais[materialCode].quantidade -= quantidadeSolicitada;
+            localStorage.setItem("materiais", JSON.stringify(materiais));
+            populateMaterialDropdown();
+            checkLowStock();
+        }
+
+        row.cells[4].innerHTML = '<span class="text-green-700"><i class="fa-solid fa-check-circle"></i> Entregue</span>';
+        row.classList.add("priority-low");
+        row.setAttribute('data-status', 'Entregue');
+        row.cells[7].textContent = dataFinal;
+
+        [...row.querySelectorAll("button")].forEach(b => {
+            b.disabled = true;
+            b.classList.add("opacity-50", "cursor-not-allowed");
+        });
+
+        saveRequestsTable();
+
+        if (currentUser !== originalSolicitante) {
+            showFeedback(`Sua solicitação de ${materialCode} foi entregue!`, "bg-blue-100", "text-blue-700");
+        }
+    }
+
+    function excluir(btn) {
+        if (!(currentUserPermissao === "admin" || currentUserPermissao === "mista" || currentUserPermissao === "master")) {
+            alert("Você não tem permissão para cancelar solicitações.");
+            return;
+        }
+
+        const row = btn.closest("tr");
+        const dataFinal = new Date().toLocaleString("pt-BR", {
+            day: "2-digit", month: "2-digit", year: "numeric",
+            hour: "2-digit", minute: "2-digit"
+        });
+
+        const materialCellContent = row.cells[1].textContent;
+        const materialCode = materialCellContent.split(" - ")[0];
+
+        const originalSolicitante = row.getAttribute('data-solicitante');
+
+        row.cells[4].innerHTML = '<span class="text-red-700"><i class="fa-solid fa-times-circle"></i> Cancelado</span>';
+        row.classList.add("priority-high");
+        row.setAttribute('data-status', 'Cancelado');
+        row.cells[7].textContent = dataFinal;
+
+        [...row.querySelectorAll("button")].forEach(b => {
+            b.disabled = true;
+            b.classList.add("opacity-50", "cursor-not-allowed");
+        });
+        showFeedback("Solicitação cancelada.", "bg-red-100", "text-red-800");
+        saveRequestsTable();
+
+        if (currentUser !== originalSolicitante) {
+            showFeedback(`Sua solicitação de ${materialCode} foi cancelada.`, "bg-red-100", "text-red-700");
+        }
+    }
+
+    function saveRequestsTable() {
+        localStorage.setItem("solicitacoes", document.getElementById("requestsTableBody").innerHTML);
+    }
+
+    function loadRequestsTable() {
+        const saved = localStorage.getItem("solicitacoes");
+        if (saved) {
+            document.getElementById("requestsTableBody").innerHTML = saved;
+            document.querySelectorAll("#requestsTableBody button").forEach(button => {
+                if (!button.disabled) {
+                    if (button.textContent.includes("✔")) {
+                        button.onclick = function() { concluir(this); };
+                    } else if (button.textContent.includes("✖")) {
+                        button.onclick = function() { excluir(this); };
+                    }
+                }
+            });
+
+            document.querySelectorAll("#requestsTableBody tr").forEach(row => {
+                const status = row.getAttribute('data-status');
+                row.classList.remove('priority-low', 'priority-high', 'priority-medium');
+                if (status === 'Entregue') {
+                    row.classList.add('priority-low');
+                } else if (status === 'Cancelado') {
+                    row.classList.add('priority-high');
+                }
+            });
+        }
+        applyStatusFilter();
+    }
+
+    function applyStatusFilter() {
+        const selectedStatus = document.getElementById("statusFilter").value;
+        const rows = document.querySelectorAll("#requestsTableBody tr");
+        rows.forEach(row => {
+            const rowStatus = row.getAttribute('data-status');
+            if (selectedStatus === "Todos" || rowStatus === selectedStatus) {
+                row.style.display = "";
+            } else {
+                row.style.display = "none";
+            }
+        });
+    }
+
+    document.getElementById("statusFilter").addEventListener("change", function() {
+        applyStatusFilter();
+    });
+
+    function showFeedback(msg, bg, text) {
+        const fb = document.getElementById("feedback");
+        fb.textContent = msg;
+        fb.className = `block p-3 rounded ${bg} ${text}`;
+        fb.classList.remove("hidden");
+        setTimeout(() => {
+            fb.classList.add("hidden");
+        }, 3000);
+    }
+
+    function checkLowStock() {
+        const lowStockMaterials = [];
+        for (const code in materiais) {
+            if (materiais[code].quantidade <= LOW_STOCK_THRESHOLD) {
+                lowStockMaterials.push({
+                    code: code,
+                    descricao: materiais[code].descricao,
+                    quantidade: materiais[code].quantidade,
+                    unit: materiais[code].unit
+                });
+            }
+        }
+
+        const lowStockAlert = document.getElementById("lowStockAlert");
+        if (lowStockMaterials.length > 0 && (currentUserPermissao === "admin" || currentUserPermissao === "mista")) {
+            lowStockAlert.classList.remove("hidden");
+        } else {
+            lowStockAlert.classList.add("hidden");
+        }
+    }
+
+    function openLowStockModal() {
+        const lowStockMaterials = [];
+        for (const code in materiais) {
+            if (materiais[code].quantidade <= LOW_STOCK_THRESHOLD) {
+                lowStockMaterials.push({
+                    code: code,
+                    descricao: materiais[code].descricao,
+                    quantidade: materiais[code].quantidade,
+                    unit: materiais[code].unit
+                });
+            }
+        }
+
+        const lowStockListDiv = document.getElementById("lowStockList");
+        lowStockListDiv.innerHTML = "";
+
+        if (lowStockMaterials.length === 0) {
+            lowStockListDiv.innerHTML = "<p>Nenhum material com estoque baixo no momento.</p>";
+        } else {
+            lowStockMaterials.forEach(material => {
+                const p = document.createElement("p");
+                p.className = "p-2 border border-gray-200 rounded bg-red-50 text-red-800 flex justify-between items-center list-group-item";
+                p.innerHTML = `
+                    <span>${material.code} - ${material.descricao}: ${material.quantidade} ${material.unit}</span>
+                    <button class="btn btn-primary btn-editar-qtd bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded text-xs" data-material-code="${material.code}">
+                        Editar Qtd
+                    </button>
+                `;
+                lowStockListDiv.appendChild(p);
+            });
+
+            document.querySelectorAll('.btn-editar-qtd').forEach(button => {
+                button.addEventListener('click', function() {
+                    const materialCode = this.dataset.materialCode;
+                    const quantityToPurchase = prompt("Quantas unidades deseja solicitar para compra?");
+                    const parsedQuantidade = parseInt(quantityToPurchase);
+
+                    if (parsedQuantidade > 0) {
+                        adicionarNaTabelaCompras(materialCode, parsedQuantidade, "Alta", document.getElementById("solicitante").value);
+                        alert("Solicitação de compra enviada com sucesso!");
+                    } else if (quantityToPurchase !== null) {
+                        alert("Invalid quantity. Please enter a number greater than 0.");
+                    }
+                });
+            });
+        }
+        document.getElementById("lowStockModal").classList.remove("hidden");
+    }
+
+    function closeLowStockModal() {
+        document.getElementById("lowStockModal").classList.add("hidden");
+    }
+
+    function abrirAdicionarEstoque() {
+        if (currentUserPermissao === "admin" || currentUserPermissao === "mista") {
+            document.getElementById("estoqueScreen").classList.remove("hidden");
+            document.getElementById("exportStockBtn").classList.remove("hidden");
+            listExistingMaterials();
+        } else {
+            alert("Você não tem permissão para adicionar estoque.");
+        }
+    }
+    function fecharAdicionarEstoque() {
+        document.getElementById("estoqueScreen").classList.add("hidden");
+    }
+    function salvarNovoEstoque() {
+        const codigo = document.getElementById("novoCodigo").value.trim();
+        const descricao = document.getElementById("novaDescricao").value.trim();
+        const quantidade = parseInt(document.getElementById("novaQuantidade").value.trim());
+        const unidade = document.getElementById("novaUnidade").value.trim();
+        const localizacao = document.getElementById("novaLocalizacao").value.trim();
+        const peso = document.getElementById("novoPeso").value.trim();
+
+        if (!codigo || !descricao || isNaN(quantidade) || !unidade || !localizacao || !peso) {
+            alert("Preencha todos os campos.");
+            return;
+        }
+        if (materiais[codigo]) {
+            alert("Já existe um material com esse código.");
+            return;
+        }
+
+        materiais[codigo] = {
+            quantidade: quantidade,
+            descricao: descricao,
+            unit: unidade,
+            location: localizacao,
+            weight: peso
+        };
+
+        localStorage.setItem("materiais", JSON.stringify(materiais));
+        populateMaterialDropdown();
+        listExistingMaterials();
+        showFeedback("Material adicionado com sucesso!", "bg-green-100", "text-green-700");
+        checkLowStock();
+
+        document.getElementById("novoCodigo").value = "";
+        document.getElementById("novaDescricao").value = "";
+        document.getElementById("novaQuantidade").value = "";
+        document.getElementById("novaUnidade").value = "";
+        document.getElementById("novaLocalizacao").value = "";
+        document.getElementById("novoPeso").value = "";
+    }
+
+    function listExistingMaterials() {
+        const listDiv = document.getElementById("existingMaterialsList");
+        listDiv.innerHTML = "";
+
+        if (Object.keys(materiais).length === 0) {
+            listDiv.innerHTML = "<p class='text-gray-600'>Nenhum material cadastrado.</p>";
+            return;
+        }
+
+        for (const code in materiais) {
+            const m = materiais[code];
+            const itemDiv = document.createElement("div");
+            itemDiv.className = "flex items-center justify-between p-2 border border-gray-200 rounded";
+            itemDiv.innerHTML = `
+                <span class="text-sm font-medium">${code} - ${m.descricao}</span>
+                <span class="text-sm text-gray-700">Qtd: ${m.quantidade} ${m.unit}</span>
+                <button onclick="editarMaterialEstoque('${code}')" class="bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded text-xs">
+                    Editar Qtd
+                </button>
+            `;
+            listDiv.appendChild(itemDiv);
+        }
+    }
+
+    function editarMaterialEstoque(materialCode) {
+        if (!(currentUserPermissao === "admin" || currentUserPermissao === "mista" || currentUserPermissao === "master")) {
+            alert("Você não tem permissão para editar o estoque.");
+            return;
+        }
+
+        const currentQuantidade = materiais[materialCode].quantidade;
+        let newQuantidade = prompt(`Digite a nova quantidade para "${materialCode} - ${materiais[materialCode].descricao}" (atual: ${currentQuantidade}):`);
+
+        if (newQuantidade === null) {
+            return;
+        }
+
+        newQuantidade = parseInt(newQuantidade.trim());
+
+        if (isNaN(newQuantidade) || newQuantidade < 0) {
+            alert("Quantidade inválida. Por favor, digite um número positivo.");
+            return;
+        }
+
+        materiais[materialCode].quantidade = newQuantidade;
+        localStorage.setItem("materiais", JSON.stringify(materiais));
+        populateMaterialDropdown();
+        listExistingMaterials();
+        checkLowStock();
+        showFeedback(`Quantidade de "${materialCode}" atualizada para ${newQuantidade}.`, "bg-green-100", "text-green-700");
+    }
+
+    function abrirConfiguracoes() {
+        if (currentUserPermissao !== "admin") {
+            alert("Apenas o usuário admin pode editar as configurações.");
+            return;
+        }
+        document.getElementById("configScreen").classList.remove("hidden");
+        document.getElementById("tempoAlta").value = localStorage.getItem("tempoAlta") || "Entrega imediata";
+        document.getElementById("tempoMedia").value = localStorage.getItem("tempoMedia") || "Entrega em 2 horas";
+        document.getElementById("tempoBaixa").value = localStorage.getItem("tempoBaixa") || "Entrega em 4 horas";
+        listarUsuarios();
+    }
+    function fecharConfig() {
+        document.getElementById("configScreen").classList.add("hidden");
+    }
+    function salvarConfiguracoes() {
+        localStorage.setItem("tempoAlta", document.getElementById("tempoAlta").value);
+        localStorage.setItem("tempoMedia", document.getElementById("tempoMedia").value);
+        localStorage.setItem("tempoBaixa", document.getElementById("tempoBaixa").value);
+        aplicarTempos();
+        fecharConfig();
+        showFeedback("Configurações salvas com sucesso!", "bg-green-100", "text-green-700");
+    }
+
+    function aplicarTempos() {
+        const tempoAlta = localStorage.getItem("tempoAlta") || "Entrega imediata";
+        const tempoMedia = localStorage.getItem("tempoMedia") || "Entrega em 2 horas";
+        const tempoBaixa = localStorage.getItem("tempoBaixa") || "Entrega em 4 horas";
+
+        const prioridade = document.getElementById("prioridade");
+        if (prioridade && prioridade.options.length >= 3) {
+            prioridade.options[0].text = `Baixa (${tempoBaixa})`;
+            prioridade.options[1].text = `Média (${tempoMedia})`;
+            prioridade.options[2].text = `Alta (${tempoAlta})`;
+        }
+    }
+
+    function salvarUsuarios() {
+        localStorage.setItem(usuariosKey, JSON.stringify(usuarios));
+        listarUsuarios();
+    }
+
+    function listarUsuarios() {
+        const tbody = document.getElementById("tabelaUsuarios");
+        if (!tbody) return;
+        tbody.innerHTML = "";
+        usuarios = JSON.parse(localStorage.getItem(usuariosKey));
+        Object.entries(usuarios).forEach(([user, info]) => {
+            const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td class="p-2">${user}</td>
+                <td class="p-2">
+                    ${info.permissao === "admin"
+                        ? '<span class="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs"><i class="fa-solid fa-crown"></i> Admin</span>'
+                        : info.permissao === "mista"
+                        ? '<span class="bg-purple-100 text-purple-800 px-2 py-1 rounded-full text-xs"><i class="fa-solid fa-gear"></i> Mista</span>'
+                        : info.permissao === "master"
+                        ? '<span class="bg-orange-100 text-orange-800 px-2 py-1 rounded-full text-xs"><i class="fa-solid fa-star"></i> Master</span>'
+                        : '<span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs"><i class="fa-solid fa-box"></i> Solicitante</span>'}
+                </td>
+                <td class="p-2">
+                    ${info.aprovador === "ap1"
+                        ? '<span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">Aprovador 1</span>'
+                        : info.aprovador === "ap2"
+                        ? '<span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">Aprovador 2</span>'
+                        : info.aprovador === "ap3"
+                        ? '<span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">Aprovador 3</span>'
+                        : '<span class="bg-gray-100 text-gray-800 px-2 py-1 rounded-full text-xs">Nenhum</span>'}
+                </td>
+                <td class="p-2 space-x-2">
+                    <button onclick="editarUsuario('${user}')" class="text-blue-600 hover:underline">Editar</button>
+                    <button onclick="excluirUsuario('${user}')" class="text-red-600 hover:underline">Excluir</button>
+                </td>`;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function cadastrarUsuario() {
+        const user = document.getElementById("novoUsuario").value.trim();
+        const senha = document.getElementById("senhaUsuario").value.trim();
+        const permissao = document.getElementById("permissaoUsuario").value;
+        const aprovador = document.getElementById("aprovadorUsuario").value;
+        const nomeCompleto = user; // For simplicity, use username as full name for new users
+
+        if (!user || !senha) {
+            alert("Preencha todos os campos para cadastrar o usuário.");
+            return;
+        }
+        if (usuarios[user]) {
+            alert("Já existe um usuário com esse nome.");
+            return;
+        }
+        usuarios[user] = { senha, permissao, nomeCompleto, aprovador };
+        salvarUsuarios();
+        document.getElementById("novoUsuario").value = "";
+        document.getElementById("senhaUsuario").value = "";
+        document.getElementById("permissaoUsuario").value = "solicitante";
+        document.getElementById("aprovadorUsuario").value = "";
+        showFeedback("Usuário cadastrado com sucesso!", "bg-green-100", "text-green-700");
+    }
+
+    function editarUsuario(user) {
+        const currentInfo = usuarios[user];
+        let novaSenha = prompt("Nova senha para " + user + " (deixe em branco para manter a atual):", "");
+        if (novaSenha === null) return;
+        if (novaSenha === "") novaSenha = currentInfo.senha;
+
+        let novaPerm = prompt("Nova permissão para " + user + " (admin, mista, master ou solicitante):", currentInfo.permissao);
+        if (novaPerm === null) return;
+
+        novaPerm = novaPerm.toLowerCase();
+        if (!["admin", "mista", "master", "solicitante"].includes(novaPerm)) {
+            alert("Permissão inválida. Use 'admin', 'mista', 'master' ou 'solicitante'.");
+            return;
+        }
+
+        let novoAprovador = prompt("Nova designação de aprovador para " + user + " (ap1, ap2, ap3 ou vazio para nenhum):", currentInfo.aprovador);
+        if (novoAprovador === null) return;
+        novoAprovador = novoAprovador.toLowerCase();
+        if (!["ap1", "ap2", "ap3", ""].includes(novoAprovador)) {
+            alert("Designação de aprovador inválida. Use 'ap1', 'ap2', 'ap3' ou deixe em branco.");
+            return;
+        }
+
+        usuarios[user].senha = novaSenha;
+        usuarios[user].permissao = novaPerm;
+        usuarios[user].aprovador = novoAprovador;
+        // Update nomeCompleto if it's a specific master user
+        if (user === "Ricardo") usuarios[user].nomeCompleto = "Ricardo (SUP)";
+        else if (user === "Sabino") usuarios[user].nomeCompleto = "Sabino (GP)";
+        else if (user === "Pablo") usuarios[user].nomeCompleto = "Pablo (CO)";
+        else if (user === "admin") usuarios[user].nomeCompleto = "Admin (ADM)";
+        else if (user === "Simone") usuarios[user].nomeCompleto = "Simone (ENC)";
+        else if (user === "Vinicius") usuarios[user].nomeCompleto = "Vinicius (SOL)";
+        else if (user === "Teste") usuarios[user].nomeCompleto = "Teste (Mista)";
+        else usuarios[user].nomeCompleto = user; // Default for others
+
+        salvarUsuarios();
+        showFeedback("Usuário editado com sucesso!", "bg-green-100", "text-green-700");
+    }
+
+    function excluirUsuario(user) {
+        if (user === "admin" || user === "Ricardo" || user === "Sabino" || user === "Pablo" || user === "Simone" || user === "Vinicius" || user === "Teste") {
+            alert("Este usuário padrão não pode ser excluído.");
+            return;
+        }
+        if (confirm("Deseja realmente excluir o usuário " + user + "?")) {
+            delete usuarios[user];
+            salvarUsuarios();
+            showFeedback("Usuário excluído com sucesso!", "bg-green-100", "text-green-700");
+        }
+    }
+
+    function escapeCsv(value) {
+        if (value === null || value === undefined) {
+            return '';
+        }
+        value = String(value);
+        if (value.includes(',') || value.includes('"') || value.includes('\n') || value.includes('\r')) {
+            return '"' + value.replace(/"/g, '""') + '"';
+        }
+        return value;
+    }
+
+    function exportRequestsToCsv() {
+        const table = document.getElementById("requestsTable");
+        let csv = [];
+
+        const headers = [
+            "ID", "Material", "Qtd", "Prioridade", "Status", "Solicitante", "Data Solicitação", "Data Finalização"
+        ];
+        csv.push(headers.map(h => escapeCsv(h)).join(','));
+
+        const tbodyRows = Array.from(document.getElementById("requestsTableBody").rows);
+        tbodyRows.forEach(row => {
+            if (row.style.display !== "none") {
+                let rowData = [];
+                rowData.push(escapeCsv(row.cells[0].textContent.trim()));
+                rowData.push(escapeCsv(row.cells[1].textContent.trim()));
+                rowData.push(escapeCsv(row.cells[2].textContent.trim()));
+                rowData.push(escapeCsv(row.cells[3].textContent.trim()));
+                const statusCell = row.cells[4];
+                let statusText = statusCell.textContent.trim();
+                statusText = statusText.replace(/[\u2713\u2717]/g, '').trim();
+                rowData.push(escapeCsv(statusText));
+                rowData.push(escapeCsv(row.cells[5].textContent.trim()));
+                rowData.push(escapeCsv(row.cells[6].textContent.trim()));
+                rowData.push(escapeCsv(row.cells[7].textContent.trim()));
+
+                csv.push(rowData.join(','));
+            }
+        });
+
+        downloadCsv(csv.join('\n'), 'solicitacoes.csv');
+        showFeedback("Solicitações exportadas para CSV!", "bg-blue-100", "text-blue-700");
+    }
+
+    function exportStockToCsv() {
+        let csv = [];
+        csv.push(escapeCsv("Código") + "," + escapeCsv("Descrição") + "," + escapeCsv("Quantidade") + "," + escapeCsv("Unidade") + "," + escapeCsv("Localização") + "," + escapeCsv("Peso"));
+
+        for (const code in materiais) {
+            const m = materiais[code];
+            csv.push(`${escapeCsv(code)},${escapeCsv(m.descricao)},${escapeCsv(m.quantidade)},${escapeCsv(m.unit)},${escapeCsv(m.location)},${escapeCsv(m.weight)}`);
+        }
+
+        downloadCsv(csv.join('\n'), 'estoque.csv');
+        showFeedback("Estoque exportado para CSV!", "bg-blue-100", "text-blue-700");
+    }
+
+    function downloadCsv(csvContent, fileName) {
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement("a");
+        if (link.download !== undefined) {
+            const url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", fileName);
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    }
+
+    function downloadStockTemplate() {
+        const header = "Código,Descrição,Quantidade,Unidade,Localização,Peso";
+        downloadCsv(header, 'template_estoque.csv');
+        showFeedback("Template CSV baixado!", "bg-blue-100", "text-blue-700");
+    }
+
+    function abrirDashboard() {
+        atualizarResumoEstoque();
+        if (!(currentUserPermissao === "admin" || currentUserPermissao === "mista" || currentUserPermissao === "master")) {
+            alert("Você não tem permissão para visualizar o Dashboard.");
+            return;
+        }
+
+        const rows = document.querySelectorAll("#requestsTableBody tr");
+
+        let total = 0, entregues = 0, canceladas = 0, pendentes = 0;
+        rows.forEach(row => {
+            const status = row.getAttribute("data-status");
+            total++;
+            if (status === "Entregue") entregues++;
+            else if (status === "Cancelado") canceladas++;
+            else pendentes++;
+        });
+
+        document.getElementById("totalSolicitacoes").textContent = total;
+        document.getElementById("entreguesSolicitacoes").textContent = entregues;
+        document.getElementById("canceladasSolicitacoes").textContent = canceladas;
+        document.getElementById("pendentesSolicitacoes").textContent = pendentes;
+
+        let totalItens = 0;
+        let baixos = 0;
+        for (const code in materiais) {
+            totalItens++;
+            if (materiais[code].quantidade <= LOW_STOCK_THRESHOLD) baixos++;
+        }
+
+        document.getElementById("totalItensEstoque").textContent = totalItens;
+
+        let entreguesEstoque = 0;
+        for (const row of document.querySelectorAll("#requestsTableBody tr")) {
+            const status = row.getAttribute("data-status");
+            if (status === "Entregue") {
+                entreguesEstoque += parseInt(row.cells[2].textContent.trim());
+            }
+        }
+        document.getElementById("totalItensEntregues").textContent = entreguesEstoque;
+
+        const ctxPizza = document.getElementById('solicitacoesChart').getContext('2d');
+
+        if (window.solicitacoesPieChart) {
+            window.solicitacoesPieChart.destroy();
+        }
+
+        window.solicitacoesPieChart = new Chart(ctxPizza, {
+            type: 'pie',
+            data: {
+                labels: ['Pendentes', 'Entregues', 'Canceladas'],
+                datasets: [{
+                    data: [pendentes, entregues, canceladas],
+                    backgroundColor: [
+                        'rgba(255, 193, 7, 0.8)',
+                        'rgba(56, 142, 60, 0.8)',
+                        'rgba(211, 47, 47, 0.8)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 193, 7, 1)',
+                        'rgba(56, 142, 60, 1)',
+                        'rgba(211, 47, 47, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        position: 'top',
+                    },
+                    title: {
+                        display: true,
+                        text: 'Distribuição de Solicitações por Status'
+                    }
+                }
+            }
+        });
+
+        const ctxEstoque = document.getElementById('estoqueChart').getContext('2d');
+
+        if (window.estoqueBarChart) {
+            window.estoqueBarChart.destroy();
+        }
+
+        window.estoqueBarChart = new Chart(ctxEstoque, {
+            type: 'bar',
+            data: {
+                labels: ['Total de Itens', 'Itens com Estoque Baixo', 'Itens Entregues'],
+                datasets: [{
+                    label: 'Quantidade',
+                    data: [totalItens, baixos, entreguesEstoque],
+                    backgroundColor: [
+                        'rgba(0, 114, 184, 0.8)',
+                        'rgba(211, 47, 47, 0.8)',
+                        'rgba(56, 142, 60, 0.8)'
+                    ],
+                    borderColor: [
+                        'rgba(0, 114, 184, 1)',
+                        'rgba(211, 47, 47, 1)',
+                        'rgba(56, 142, 60, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    title: {
+                        display: true,
+                        text: 'Resumo do Estoque'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        title: {
+                            display: true,
+                            text: 'Contagem'
+                        }
+                    },
+                    x: {}
+                }
+            }
+        });
+
+        document.getElementById("dashboardScreen").classList.remove("hidden");
+    }
+
+    function fecharDashboard() {
+        document.getElementById("dashboardScreen").classList.add("hidden");
+    }
+
+    function importStockFromCsv() {
+        const fileInput = document.getElementById('importStockFile');
+        const file = fileInput.files[0];
+
+        if (!file) {
+            alert('Por favor, selecione um arquivo CSV para importar.');
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const text = e.target.result;
+            const lines = text.split('\n').filter(line => line.trim() !== '');
+
+            if (lines.length === 0) {
+                showFeedback("O arquivo CSV está vazio.", "bg-red-100", "text-red-700");
+                return;
+            }
+
+            materiais = {};
+
+            let importedCount = 0;
+            let updatedCount = 0;
+            let errorCount = 0;
+            let errorMessages = [];
+
+            const csvRegex = /(?:\"([^\"]*(?:\"\"[^\"]*)*)\"|([^",]*))(?:,|$)/g;
+
+            for (let i = 1; i < lines.length; i++) {
+                const line = lines[i];
+                const values = [];
+                let match;
+                let lastIndex = 0;
+
+                while ((match = csvRegex.exec(line)) !== null) {
+                    let value = match[1] !== undefined ? match[1] : match[2];
+                    if (value === undefined) value = '';
+                    values.push(value.replace(/""/g, '"').trim());
+                    lastIndex = csvRegex.lastIndex;
+                }
+                if (lastIndex < line.length && line.charAt(lastIndex - 1) === ',') {
+                    values.push('');
+                }
+
+                if (values.length < 6) {
+                    errorMessages.push(`Linha ${i + 1} ignorada: Formato inválido. Esperado 6 colunas, encontrado ${values.length}. Linha: "${line}"`);
+                    errorCount++;
+                    continue;
+                }
+
+                const codigo = values[0];
+                const descricao = values[1];
+                const quantidade = parseInt(values[2].replace(',', '.'));
+                const unidade = values[3];
+                const localizacao = values[4];
+                const peso = values[5].replace(',', '.');
+
+                const finalPeso = peso || "N/A";
+
+                if (!codigo || !descricao || isNaN(quantidade) || !unidade || !localizacao) {
+                    errorMessages.push(`Linha ${i + 1} ignorada: Dados incompletos ou inválidos (Código: "${codigo}", Qtd: "${values[2]}"). Linha: "${line}"`);
+                    errorCount++;
+                    continue;
+                }
+
+                if (materiais[codigo]) {
+                    materiais[codigo].descricao = descricao;
+                    materiais[codigo].quantidade = quantidade;
+                    materiais[codigo].unit = unidade;
+                    materiais[codigo].location = localizacao;
+                    materiais[codigo].weight = finalPeso;
+                    updatedCount++;
+                } else {
+                    materiais[codigo] = {
+                        quantidade: quantidade,
+                        descricao: descricao,
+                        unit: unidade,
+                        location: localizacao,
+                        weight: finalPeso
+                    };
+                    importedCount++;
+                }
+            }
+
+            localStorage.setItem("materiais", JSON.stringify(materiais));
+            populateMaterialDropdown();
+            listExistingMaterials();
+            checkLowStock();
+            fecharAdicionarEstoque();
+
+            let feedbackMsg = `Importação concluída: ${importedCount} novos materiais, ${updatedCount} materiais atualizados.`;
+            if (errorCount > 0) {
+                feedbackMsg += ` ${errorCount} linhas com erro.`;
+                showFeedback(feedbackMsg, "bg-yellow-100", "text-yellow-700");
+                alert("Algumas linhas foram ignoradas devido a erros de formato ou dados incompletos. Verifique o console do navegador para mais detalhes.\n\n" + errorMessages.slice(0, 5).join('\n') + (errorMessages.length > 5 ? '\n...' : ''));
+                console.error("Erros de importação CSV:", errorMessages);
+            } else {
+                showFeedback(feedbackMsg, "bg-green-100", "text-green-700");
+            }
+            fileInput.value = '';
+        };
+
+        reader.onerror = function() {
+            showFeedback("Erro ao ler o arquivo.", "bg-red-100", "text-red-700");
+        };
+
+        reader.readAsText(file, 'UTF-8');
+    }
+
+    function limparEstoque() {
+        if (confirm("Tem certeza que deseja apagar TODO o estoque? Esta ação não pode ser desfeita.")) {
+            materiais = {};
+            localStorage.setItem("materiais", JSON.stringify(materiais));
+            populateMaterialDropdown();
+            listExistingMaterials();
+            checkLowStock();
+            showFeedback("Estoque limpo com sucesso!", "bg-green-100", "text-green-700");
+            fecharAdicionarEstoque();
+        }
+    }
+
+    function limparHistoricoSolicitacoes() {
+        if (currentUserPermissao !== "admin") {
+            alert("Apenas o usuário admin pode limpar o histórico de solicitações.");
+            return;
+        }
+        if (confirm("Tem certeza que deseja apagar TODO o histórico de solicitações? Esta ação não pode ser desfeita.")) {
+            localStorage.removeItem("solicitacoes");
+            document.getElementById("requestsTableBody").innerHTML = "";
+            showFeedback("Histórico de solicitações limpo com sucesso!", "bg-green-100", "text-green-700");
+            fecharConfig();
+        }
+    }
+
+    // New function to clear purchase history
+    function limparHistoricoCompras() {
+        if (currentUserPermissao !== "admin") {
+            alert("Apenas o usuário admin pode apagar o histórico de compras.");
+            return;
+        }
+        if (confirm("Tem certeza que deseja apagar TODO o histórico de compras? Esta ação não pode ser desfeita.")) {
+            localStorage.removeItem("compras");
+            document.getElementById("comprasTableBody").innerHTML = "";
+            showFeedback("Histórico de compras apagado com sucesso!", "bg-green-100", "text-green-700");
+            fecharConfig();
+        }
+    }
+
+    document.getElementById("btnLogin").addEventListener("click", login);
+
+    window.onload = function() {
+        inicializarUsuarios();
+        document.body.classList.add("body-login");
+        populateMaterialDropdown();
+        loadRequestsTable();
+        loadComprasTable(); // Load purchase requests on page load
+        aplicarTempos();
+    };
+
+    function atualizarResumoEstoque() {
+        let total = 0;
+        let baixos = 0;
+        let entregues = 0;
+
+        for (const code in materiais) {
+            const qtd = materiais[code].quantidade;
+            total++;
+            if (qtd <= LOW_STOCK_THRESHOLD) baixos++;
+        }
+
+        for (const row of document.querySelectorAll("#requestsTableBody tr")) {
+            const status = row.getAttribute("data-status");
+            if (status === "Entregue") {
+                entregues += parseInt(row.cells[2].textContent.trim());
+            }
+        }
+
+        document.getElementById("estoqueTotal").textContent = `📦 Itens totais: ${total}`;
+        document.getElementById("estoqueBaixo").textContent = `⚠️ Estoque baixo (≤ 5): ${baixos}`;
+        document.getElementById("estoqueEntregues").textContent = `✅ Itens entregues: ${entregues}`;
+    }
+
+    // Purchase Request Table Logic
+    function adicionarNaTabelaCompras(materialCode, qtd, prioridade, solicitante) {
+        const id = Math.floor(Math.random() * 100000);
+        const tbody = document.getElementById('comprasTableBody');
+        const tr = document.createElement('tr');
+        tr.dataset.id = id;
+        tr.innerHTML = `
+            <td>${id}</td>
+            <td>${materialCode}</td>
+            <td>${qtd}</td>
+            <td>${prioridade}</td>
+            <td class="status status-text aguardando-text">Aguardando aprovação</td>
+            <td>${solicitante}<br><small>${new Date().toLocaleString()}</small></td>
+            <td class="ap" data-ap="1"></td>
+            <td class="ap" data-ap="2"></td>
+            <td class="ap" data-ap="3"></td>
+            <td>
+                <span class="icon-btn aprove" onclick="aprovarEtapa(this)">✔</span>
+                <span class="icon-btn reprove" onclick="reprove(this)">✖</span>
+            </td>
+        `;
+        tbody.appendChild(tr);
+        saveComprasTable();
+        updateApprovalButtonsVisibility(); // Update visibility for new row
+    }
+
+    function saveComprasTable() {
+        localStorage.setItem("compras", document.getElementById("comprasTableBody").innerHTML);
+    }
+
+    function loadComprasTable() {
+        const saved = localStorage.getItem("compras");
+        if (saved) {
+            document.getElementById("comprasTableBody").innerHTML = saved;
+            // Re-attach event listeners for approval/rejection buttons
+            document.querySelectorAll('#comprasTableBody .icon-btn.aprove').forEach(button => {
+                button.onclick = function() { aprovarEtapa(this); };
+            });
+            document.querySelectorAll('#comprasTableBody .icon-btn.reprove').forEach(button => {
+                button.onclick = function() { reprove(this); };
+            });
+        }
+        updateApprovalButtonsVisibility(); // Ensure correct button states after loading
+    }
+
+    function aprovarEtapa(button) {
+        const tr = button.closest('tr');
+        const statusCell = tr.querySelector('.status');
+        const currentStatusText = statusCell.textContent;
+        const approverName = usuarios[currentUser].nomeCompleto;
+
+        if (currentStatusText.includes('Reprovado')) {
+            alert("A solicitação já foi reprovada. Não é possível aprovar.");
+            return;
+        }
+        if (currentStatusText.includes("RM ")) {
+            alert("A RM já foi gerada. Não é possível aprovar novamente.");
+            return;
+        }
+
+        if (currentUserPermissao === "solicitante") {
+            alert("Você não tem permissão para aprovar solicitações de compra.");
+            return;
+        }
+
+        const apCells = tr.querySelectorAll('.ap');
+        let approved = false;
+        let currentApStage = -1; // 0 for AP1, 1 for AP2, 2 for AP3
+
+        // Determine the next pending approval stage
+        for (let i = 0; i < apCells.length; i++) {
+            if (!apCells[i].textContent.trim()) {
+                currentApStage = i;
+                break;
+            }
+        }
+
+        if (currentApStage === -1) {
+            alert("Todas as aprovações já foram concluídas.");
+            return;
+        }
+
+        // Authorization logic based on approver role
+        if (currentUserPermissao === "admin") {
+            apCells[currentApStage].innerHTML = `${approverName}<br><small>${new Date().toLocaleString()}</small>`;
+            approved = true;
+        } else if (currentUserPermissao === "master" || currentUserPermissao === "mista") {
+            // MODIFIED LOGIC: Allow master users to approve AP2 and AP3
+            if ((currentUserApprover === "ap1" && currentApStage === 0) ||
+                ((currentUserApprover === "ap2" || currentUserPermissao === "master") && currentApStage === 1) ||
+                ((currentUserApprover === "ap3" || currentUserPermissao === "master") && currentApStage === 2)) {
+                apCells[currentApStage].innerHTML = `${approverName}<br><small>${new Date().toLocaleString()}</small>`;
+                approved = true;
+            } else {
+                alert(`Você (${approverName}) não está autorizado a aprovar esta etapa (AP${currentApStage + 1}).`);
+                return;
+            }
+        } else {
+            alert("Você não tem permissão para aprovar solicitações de compra.");
+            return;
+        }
+
+        if (approved) {
+            updateStatus(tr);
+            saveComprasTable();
+            updateApprovalButtonsVisibility(); // Re-evaluate button states after approval
+        }
+    }
+
+    function reprove(el) {
+        const tr = el.closest('tr');
+        const statusCell = tr.querySelector('.status');
+        const currentStatusText = statusCell.textContent;
+        const approverName = usuarios[currentUser].nomeCompleto;
+
+
+        if (currentUserPermissao === "solicitante") {
+            alert("Você não tem permissão para reprovar solicitações de compra.");
+            return;
+        }
+
+        if (currentStatusText.includes('Reprovado')) {
+            alert("A solicitação já foi reprovada. Não é possível reprovar novamente.");
+            return;
+        }
+        if (currentStatusText.includes("RM ")) {
+            alert("A RM já foi gerada. Não é possível reprovar.");
+            return;
+        }
+
+        const motivo = prompt("Informe o motivo da reprovação:");
+        if (!motivo) return;
+
+        const apCells = tr.querySelectorAll('.ap');
+        let reproved = false;
+        let currentApStage = -1;
+
+        // Determine the next pending approval stage
+        for (let i = 0; i < apCells.length; i++) {
+            if (!apCells[i].textContent.trim()) {
+                currentApStage = i;
+                break;
+            }
+        }
+
+        if (currentApStage === -1) {
+            alert("Todas as aprovações já foram concluídas ou a solicitação já foi reprovada.");
+            return;
+        }
+
+        // Authorization logic based on approver role
+        if (currentUserPermissao === "admin") {
+            apCells[currentApStage].innerHTML = `
+                Reprovado por ${approverName}
+                <span class='reprovado-icon' onclick="alert('${motivo.replace(/'/g, "\\'")}')">⚠️</span><br>
+                <small>${new Date().toLocaleString()}</small>
+            `;
+            reproved = true;
+        } else if (currentUserPermissao === "master" || currentUserPermissao === "mista") {
+            // MODIFIED LOGIC: Allow master users to reprove AP2 and AP3
+            if ((currentUserApprover === "ap1" && currentApStage === 0) ||
+                ((currentUserApprover === "ap2" || currentUserPermissao === "master") && currentApStage === 1) ||
+                ((currentUserApprover === "ap3" || currentUserPermissao === "master") && currentApStage === 2)) {
+                apCells[currentApStage].innerHTML = `
+                    Reprovado por ${approverName}
+                    <span class='reprovado-icon' onclick="alert('${motivo.replace(/'/g, "\\'")}')">⚠️</span><br>
+                    <small>${new Date().toLocaleString()}</small>
+                `;
+                reproved = true;
+            } else {
+                alert(`Você (${approverName}) não está autorizado a reprovar esta etapa (AP${currentApStage + 1}).`);
+                return;
+            }
+        } else {
+            alert("Você não tem permissão para reprovar solicitações de compra.");
+            return;
+        }
+
+        if (reproved) {
+            statusCell.innerHTML = "<span class='status-text reprovado-text'>Reprovado</span>";
+            saveComprasTable();
+            updateApprovalButtonsVisibility(); // Re-evaluate button states after rejection
+        }
+    }
+
+    function updateStatus(tr) {
+        const aprovacoes = tr.querySelectorAll('.ap');
+        const statusEl = tr.querySelector('.status');
+        let allApproved = true;
+        let anyReproved = false;
+
+        for (let ap of aprovacoes) {
+            if (ap.innerText.includes("Reprovado")) {
+                anyReproved = true;
+                break;
+            }
+            if (!ap.textContent.trim()) { // Check if the cell is empty
+                allApproved = false;
+            }
+        }
+
+        if (anyReproved) {
+            statusEl.innerHTML = "<span class='status-text reprovado-text'>Reprovado</span>";
+            // Disable all buttons if reproved
+            tr.querySelectorAll('.icon-btn').forEach(btn => btn.classList.add('disabled'));
+        } else if (allApproved) {
+            const rm = prompt("Todos aprovaram. Informe o número da RM gerada:");
+            if (rm) {
+                statusEl.innerHTML = "<span class='status-text aprovado-text'>RM " + rm + "</span><br><small>" + new Date().toLocaleString() + "</small>";
+                // Disable all buttons if RM is generated
+                tr.querySelectorAll('.icon-btn').forEach(btn => btn.classList.add('disabled'));
+            }
+        }
+    }
+
+    function updateApprovalButtonsVisibility() {
+        const rows = document.querySelectorAll('#comprasTableBody tr');
+        rows.forEach(tr => {
+            const apCells = tr.querySelectorAll('.ap');
+            const approveButton = tr.querySelector('.icon-btn.aprove');
+            const reproveButton = tr.querySelector('.icon-btn.reprove');
+            const statusText = tr.querySelector('.status').textContent;
+
+            // Disable all buttons if already reproved or RM generated
+            if (statusText.includes('Reprovado') || statusText.includes('RM ')) {
+                approveButton.classList.add('disabled');
+                reproveButton.classList.add('disabled');
+                return;
+            }
+
+            let nextApStage = -1; // 0 for AP1, 1 for AP2, 2 for AP3
+            for (let i = 0; i < apCells.length; i++) {
+                if (!apCells[i].textContent.trim()) {
+                    nextApStage = i;
+                    break;
+                }
+            }
+
+            // Approval button logic
+            if (nextApStage === -1) { // All stages approved
+                approveButton.classList.add('disabled');
+            } else if (currentUserPermissao === "admin") {
+                approveButton.classList.remove('disabled'); // Admin can approve any empty stage
+            } else if (currentUserPermissao === "master" || currentUserPermissao === "mista") {
+                // MODIFIED LOGIC: Allow master users to approve AP2 and AP3
+                if ((currentUserApprover === "ap1" && nextApStage === 0) ||
+                    ((currentUserApprover === "ap2" || currentUserPermissao === "master") && nextApStage === 1) ||
+                    ((currentUserApprover === "ap3" || currentUserPermissao === "master") && nextApStage === 2)) {
+                    approveButton.classList.remove('disabled');
+                } else {
+                    approveButton.classList.add('disabled'); // Not their stage or already approved
+                }
+            } else {
+                approveButton.classList.add('disabled'); // Solicitante cannot approve
+            }
+
+            // Reprove button logic
+            if (currentUserPermissao === "solicitante") {
+                reproveButton.classList.add('disabled');
+            } else {
+                // Reprove button is enabled if not already reproved/RM and user has permission
+                reproveButton.classList.remove('disabled');
+            }
+        });
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const solicitanteInput = document.getElementById("solicitante");
+        const nomeSolicitanteHidden = document.getElementById("nomeSolicitante");
+
+        // This part is now handled by the login function setting solicitante.value
+        // and nomeSolicitante.value directly based on the logged-in user's full name.
+        // The original prompt logic for the select element is no longer directly applicable
+        // as the solicitante input is readonly and filled by the login.
+    });
 
 </script>
-</body>
+<!-- Modal do Dashboard -->
+<div class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center" id="dashboardScreen">
+<div class="bg-white p-6 rounded-lg shadow-xl max-w-3xl w-full overflow-y-auto max-h-[90vh] relative">
+<button class="absolute top-3 right-3 text-gray-500 hover:text-red-600 text-xl font-bold" onclick="fecharDashboard()">
+      ×
+    </button>
+<h2 class="text-xl font-bold text-gray-800 mb-4">📊 Dashboard - Visão Geral</h2>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="bg-gray-100 p-4 rounded shadow">
+<h3 class="text-lg font-semibold mb-2 text-[#0072B8]">Resumo de Solicitações</h3>
+<p>Total: <span class="font-bold" id="totalSolicitacoes"></span></p>
+<p>Entregues: <span class="text-green-700 font-semibold" id="entreguesSolicitacoes"></span></p>
+<p>Canceladas: <span class="text-red-700 font-semibold" id="canceladasSolicitacoes"></span></p>
+<p>Pendentes: <span class="text-yellow-700 font-semibold" id="pendentesSolicitacoes"></span></p>
+<div class="mt-4">
+<canvas id="solicitacoesChart"></canvas>
+</div>
+</div>
+<div class="bg-gray-100 p-4 rounded shadow">
+<h3 class="text-lg font-semibold mb-2 text-[#0072B8]">Estoque</h3>
+<p>Itens totais: <span class="font-bold" id="totalItensEstoque"></span></p>
+<p>Itens com estoque baixo (≤ 5): <span class="text-red-700 font-semibold" id="itensBaixosEstoque"></span></p>
+<p>Itens entregues: <span class="text-blue-700 font-semibold" id="totalItensEntregues"></span></p>
+<div class="mt-4">
+<div class="text-center mb-4" id="resumoEstoqueDinamico">
+<h3 class="text-lg font-semibold text-gray-800">Resumo do Estoque</h3>
+<div class="flex justify-center gap-4 mt-2 text-sm">
+<span class="text-blue-700 font-semibold" id="estoqueTotal">📦 Itens totais: 0</span>
+<span class="text-yellow-600 font-semibold" id="estoqueBaixo">⚠️ Estoque baixo (≤ 5): 0</span>
+<span class="text-green-600 font-semibold" id="estoqueEntregues">✅ Itens entregues: 0</span>
+</div>
+</div>
+<canvas id="estoqueChart"></canvas>
+</div>
+</div>
+</div>
+</div>
+</div></div></body>
 </html>
